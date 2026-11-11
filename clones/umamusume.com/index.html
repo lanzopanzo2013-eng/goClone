@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umamusume: Pretty Derby Official Website | Cygames</title>
+<meta name="description" content="The official website of Umamusume: Pretty Derby. Play now on Steam, App Store, Google Play and Google Play Games.">
+<!--
+  ============================================================================
+  REFERENCE CLONE — umamusume.com (captured 2026-11-10)
+  Companion file: CLONE_SPEC.md  (read that first; it explains every decision)
+  Images are hot-linked to the original CDNs on purpose, so the clone renders
+  with zero local assets. Replace with local copies for any real deployment.
+  ============================================================================
+-->
+<link rel="preconnect" href="https://parts.cygames.co.jp" crossorigin>
+<link rel="preconnect" href="https://parts.umamusume.com">
+<link rel="preconnect" href="https://en-portal.g.kuroco-img.app">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,300..900;1,300..900&family=Roboto:ital,wght@0,300..900;1,300..900&display=swap">
+<style>
+/* =========================================================================
+   1. DESIGN TOKENS  (values lifted verbatim from the production stylesheet)
+   ========================================================================= */
+:root{
+  /* brand / category colours — stored as R,G,B triplets like the original so
+     they can be used with rgb(var(--x) / .5) */
+  --color-rgb-blue: 42, 93, 250;
+  --color-rgb-pink: 255, 110, 203;
+  --color-rgb-green: 60, 167, 50;
+  --color-rgb-news: 255, 121, 208;
+  --color-rgb-news-sub: 255, 239, 247;
+  --color-rgb-news-dark: 227, 108, 185;
+  --color-rgb-characters: 140, 131, 255;
+  --color-rgb-characters-dark: 125, 117, 227;
+  --color-rgb-characters-light: 241, 239, 255;
+  --color-rgb-media: 76, 174, 255;
+  --color-rgb-media-dark: 68, 155, 227;
+  --color-news-game: 181, 217, 19;   /* category chip: Game  */
+  --color-news-media: 255, 145, 28;  /* category chip: Media */
+
+  --color-text-base: #4d4d4d;
+  --color-text-gray: #141414;
+  --color-gray: #d2d2d2;
+  --color-gray-2: #898989;
+
+  --ease-out: cubic-bezier(.19, 1, .22, 1);
+  --ease-pop:  cubic-bezier(.175, .885, .32, 1.275);
+  --ease-in:   cubic-bezier(.77, 0, .175, 1);
+
+  /* ---- scaling unit -----------------------------------------------------
+     The real site is designed on a 1920px canvas. Every length is written as
+        20px @1920  ->  1.0416666667vw @1440  ->  20.8333333333px @2000
+     i.e. it grows linearly with the viewport, then freezes at 2000px.
+     We reproduce that with ONE unit: --u == "1 design pixel".
+     Desktop/tablet: 1 design px = (100/1920)vw, clamped at 1px (>=2000px).
+     Phone:          1 design px = (100/750)vw  (the site switches to a
+                     750px-wide canvas below 900px).
+  ------------------------------------------------------------------------ */
+  --u: 0.1333333333vw;
+  --header-h: calc(88 * var(--u));
+}
+@media (min-width: 900px){
+  :root{ --u: min(0.0520833333vw, 1px); }
+}
+@media (min-width: 2000px){
+  /* the site caps its canvas at 2000px wide */
+  body{ max-width: 2000px; margin-inline: auto; }
+}
+
+/* =========================================================================
+   2. RESET (destyle.css v4 subset, as used by the original)
+   ========================================================================= */
+*,:before,:after{box-sizing:border-box;border:0 solid;min-width:0}
+html{line-height:1.15;-webkit-text-size-adjust:100%}
+body{margin:0}
+h1,h2,h3,h4,p,figure,ul,ol,dl,dd{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:inherit;text-decoration:none;display:block;cursor:pointer}
+button{font:inherit;color:inherit;background:none;padding:0;cursor:pointer}
+img,svg{display:block;width:100%;height:auto}
+img{pointer-events:none;-webkit-user-select:none;user-select:none;backface-visibility:hidden}
+
+/* =========================================================================
+   3. PAGE SHELL
+   ========================================================================= */
+body{
+  font-family:roboto,"Helvetica Neue",Arial,sans-serif;
+  font-weight:400;
+  line-height:1;
+  color:var(--color-text-base);
+  background:#fff;
+  overflow-x:hidden;
+  /* distance the "in-view" reveal travels — original uses the same idea */
+  --scroll-inview-y: calc(100 * var(--u));
+}
+.site-wrapper{position:relative;width:100%;margin:0 auto;overflow:hidden}
+main{padding-bottom:calc(134 * var(--u))}
+
+/* utility: hide/show by breakpoint, exactly like .is-PC / .is-SP */
+.is-pc{display:block}
+.is-sp{display:none}
+@media (max-width:899.98px){
+  .is-pc{display:none}
+  .is-sp{display:block}
+}
+
+/* scroll reveal — the original animates sections with .is-show */
+.js-reveal{opacity:0;transform:translate3d(0,calc(60 * var(--u)),0);
+  transition:opacity .7s var(--ease-out),transform .7s var(--ease-out)}
+.js-reveal.is-show{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){
+  .js-reveal{opacity:1;transform:none;transition:none}
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important}
+}
+
+/* =========================================================================
+   4. HEADER  (fixed, transparent over the key visual, white after scroll)
+   ========================================================================= */
+.header{
+  position:fixed;inset:0 0 auto 0;z-index:100;
+  height:var(--header-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 calc(40 * var(--u));
+  transition:background-color .4s var(--ease-out),box-shadow .4s var(--ease-out),
+             height .4s var(--ease-out);
+}
+.header__logo{width:calc(300 * var(--u));flex:none}
+.header__nav{display:flex;align-items:center;gap:calc(34 * var(--u))}
+.header__link{
+  position:relative;font-family:"Roboto Condensed",sans-serif;
+  font-weight:700;font-style:italic;letter-spacing:.06em;
+  font-size:calc(20 * var(--u));color:#fff;
+  transition:opacity .3s var(--ease-out);
+}
+.header__link:after{
+  content:"";position:absolute;left:0;right:0;bottom:calc(-8 * var(--u));
+  height:calc(3 * var(--u));background:rgb(var(--color-rgb-pink));
+  transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease-out);
+}
+.header__link:hover:after{transform:scaleX(1)}
+.header__cta{
+  display:flex;align-items:center;justify-content:center;
+  height:calc(52 * var(--u));padding:0 calc(26 * var(--u));
+  border-radius:999px;background:rgb(var(--color-rgb-pink));
+  color:#fff;font-family:"Roboto Condensed",sans-serif;
+  font-weight:700;font-style:italic;letter-spacing:.06em;
+  font-size:calc(18 * var(--u));
+  box-shadow:0 calc(4 * var(--u)) calc(10 * var(--u)) rgb(0 0 0 / .25);
+  transition:transform .3s var(--ease-pop);
+}
+.header__cta:hover{transform:scale(.95)}
+.header__burger{display:none}
+.header.is-scrolled{background:#fff;box-shadow:0 calc(2 * var(--u)) calc(20 * var(--u)) rgb(0 0 0 / .12)}
+.header.is-scrolled .header__link{color:var(--color-text-base)}
+
+/* =========================================================================
+   5. HERO / KEY VISUAL
+   Real geometry (desktop, at 1920): box 1396px tall, 824px top padding,
+   banner offset 93px, store row 66px tall, sns plate 466x66 rounded 8px.
+   ========================================================================= */
+.top-kv{position:relative;height:calc(1396 * var(--u));padding-top:calc(824 * var(--u))}
+@media (max-width:899.98px){
+  .top-kv{height:calc(1430 * var(--u));padding-top:0}
+}
+.top-kv__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;z-index:-1;
+  -webkit-mask-image:linear-gradient(to top,#0000,#0000 6%,#000 20%,#000);
+  mask-image:linear-gradient(to top,#0000,#0000 6%,#000 20%,#000);}
+@media (max-width:899.98px){
+  .top-kv__img{-webkit-mask-image:linear-gradient(to top,#0000,#000 10%,#000);
+    mask-image:linear-gradient(to top,#0000,#000 10%,#000)}
+}
+
+/* "Play Now" plate + badges + socials, stacked and centred */
+.top-kv__contents{
+  position:relative;display:flex;flex-direction:column;align-items:center;
+}
+.top-kv__contents-wrap{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+  position:relative;margin:0 auto;padding-bottom:calc(27 * var(--u))}
+.top-kv__playnow{position:absolute;top:calc(-85 * var(--u));margin-left:calc(-7 * var(--u));
+  width:calc(420 * var(--u))}
+@media (max-width:899.98px){
+  .top-kv__playnow{position:relative;top:auto;margin:calc(30 * var(--u)) 0 0;width:calc(360 * var(--u))}
+}
+.store-list{display:flex;flex-wrap:wrap;align-items:center;
+  filter:drop-shadow(0 calc(5 * var(--u)) calc(5 * var(--u)) rgb(0 0 0 / .25))}
+.store-list li{margin:0 calc(8 * var(--u))}
+.store-list a{transition:transform .3s var(--ease-pop)}
+.store-list a:hover{transform:scale(.95);transition:transform .5s var(--ease-out)}
+.store-list img{height:calc(66 * var(--u));width:auto;min-height:40px}
+
+/* Cygames WebStore banner — hover swaps the image (on/off), as on the site */
+.webstore{margin:calc(18 * var(--u)) 0 0;width:calc(560 * var(--u));position:relative;
+  transition:transform .3s var(--ease-pop);
+  filter:drop-shadow(0 calc(5 * var(--u)) calc(5 * var(--u)) rgb(0 0 0 / .25))}
+.webstore:hover{transform:scale(.97)}
+.webstore img{display:block}
+
+/* right-hand social plate */
+.sns-list{
+  display:flex;align-items:center;justify-content:space-between;
+  background:#fff;border-radius:calc(8 * var(--u));
+  width:calc(466 * var(--u));height:calc(66 * var(--u));
+  padding:0 calc(14 * var(--u)) 0 calc(21 * var(--u));
+  margin:calc(24 * var(--u)) 0 0 calc(60 * var(--u));
+  box-shadow:0 calc(4 * var(--u)) calc(14 * var(--u)) rgb(0 0 0 / .25);
+}
+.sns-list dt{font-weight:700;font-style:italic;letter-spacing:.04em;color:#000;
+  font-size:calc(19 * var(--u))}
+.sns-list dd{display:flex;align-items:center}
+.sns-list dd a{margin:0 calc(14 * var(--u));transition:transform .3s var(--ease-pop)}
+.sns-list dd a:hover{transform:scale(.85);transition:transform .5s var(--ease-out)}
+.sns-x img{width:calc(28 * var(--u))}
+.sns-facebook img{width:calc(31 * var(--u))}
+.sns-youtube img,.sns-discord img{width:calc(36 * var(--u))}
+
+/* The Game Awards badge */
+.tga-badge{position:absolute;top:calc(-203 * var(--u));right:calc(139 * var(--u));
+  width:calc(190 * var(--u));margin:24px 0 0;
+  filter:drop-shadow(0 calc(4 * var(--u)) calc(12 * var(--u)) rgb(0 0 0 / .3))}
+
+/* little vertical "scroll" rail on the right of the kv */
+.scroll-rail{position:absolute;right:calc(50 * var(--u));top:calc(912 * var(--u));
+  display:flex;flex-direction:column;align-items:center;gap:calc(8 * var(--u));
+  color:#fff;font-family:"Roboto Condensed",sans-serif;font-size:calc(12 * var(--u));
+  letter-spacing:.3em;writing-mode:vertical-rl;text-transform:uppercase}
+.scroll-rail:after{content:"";width:1px;height:calc(60 * var(--u));background:currentColor;
+  animation:rail 1.8s var(--ease-out) infinite}
+@keyframes rail{0%{transform:scaleY(.2);transform-origin:top;opacity:0}
+  40%{opacity:1}100%{transform:scaleY(1);transform-origin:top;opacity:0}}
+
+/* =========================================================================
+   6. SECTION TITLE — the slanted "ribbon" plate used by every section.
+   Production CSS: clip-path: polygon(0 0, var(--ribon) 50%, 0 100%, 100% 100%,
+   calc(100% - var(--ribon)) 50%, 100% 0)
+   ========================================================================= */
+.section-title{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:calc(760 * var(--u));min-height:calc(150 * var(--u));
+  margin:0 auto calc(-40 * var(--u));position:relative;z-index:3;
+  --ribon: calc(20 * var(--u));
+  background:#fff;
+  clip-path:polygon(0 0,var(--ribon) 50%,0 100%,100% 100%,calc(100% - var(--ribon)) 50%,100% 0);
+  padding:calc(28 * var(--u)) 0;
+}
+.section-title p{font-family:"Roboto Condensed",sans-serif;font-weight:700;font-style:italic;
+  letter-spacing:.28em;text-transform:uppercase;font-size:calc(14 * var(--u));opacity:.75}
+.section-title h2{font-family:"Roboto Condensed",sans-serif;font-weight:700;font-style:italic;
+  letter-spacing:.02em;font-size:calc(58 * var(--u));line-height:1.05;
+  color:var(--color-text-gray);margin-top:calc(4 * var(--u))}
+
+/* =========================================================================
+   7. NEWS  (pink)   contents box 1146px wide, pale pink panel, 826px tall
+   ========================================================================= */
+.top-news{position:relative;margin-top:calc(-161 * var(--u));padding-bottom:calc(97 * var(--u));
+  --color-category: rgb(var(--color-rgb-news))}
+.top-news .section-title p{color:rgb(var(--color-rgb-news-dark));opacity:1}
+.top-news .section-title h2{color:rgb(var(--color-rgb-news))}
+.top-section-box{width:calc(1146 * var(--u));margin:0 auto;position:relative;z-index:2}
+.top-section-box__contents{background-color:rgb(var(--color-rgb-news-sub));
+  border:calc(4 * var(--u)) solid #fff;border-radius:calc(13 * var(--u));
+  padding:calc(42 * var(--u)) 0 calc(28 * var(--u));
+  display:flex;flex-direction:column;min-height:calc(826 * var(--u))}
+.news-list{display:grid;gap:calc(20 * var(--u));padding:calc(14 * var(--u)) calc(40 * var(--u)) calc(20 * var(--u));}
+.news-item{
+  display:flex;align-items:center;gap:calc(20 * var(--u));
+  background:#fff;border-radius:calc(10 * var(--u));
+  padding:calc(18 * var(--u)) calc(22 * var(--u));
+  box-shadow:0 calc(3 * var(--u)) calc(8 * var(--u)) rgb(0 0 0 / .08);
+  transition:transform .3s var(--ease-pop),box-shadow .3s var(--ease-out);
+}
+.news-item:hover{transform:translateY(calc(-3 * var(--u)));
+  box-shadow:0 calc(8 * var(--u)) calc(20 * var(--u)) rgb(0 0 0 / .14);
+  transition:transform .5s var(--ease-out),box-shadow .5s var(--ease-out)}
+.news-item__thumb{width:calc(150 * var(--u));aspect-ratio:16/9;object-fit:cover;
+  border-radius:calc(6 * var(--u));flex:none;background:#eee}
+.news-item__body{flex:1;min-width:0}
+.news-item__meta{display:flex;align-items:center;gap:calc(12 * var(--u))}
+.chip{display:inline-flex;align-items:center;justify-content:center;
+  height:calc(26 * var(--u));padding:0 calc(14 * var(--u));border-radius:999px;
+  font-family:"Roboto Condensed",sans-serif;font-weight:700;font-style:italic;
+  font-size:calc(14 * var(--u));color:#fff;background:rgb(var(--color-rgb-news))}
+.chip.-game{background:rgb(var(--color-news-game));color:#141414}
+.chip.-media{background:rgb(var(--color-news-media))}
+.news-item__date{font-size:calc(14 * var(--u));color:var(--color-gray-2);
+  font-family:"Roboto Condensed",sans-serif;font-weight:500}
+.news-item__title{margin-top:calc(8 * var(--u));font-weight:700;font-size:calc(19 * var(--u));
+  line-height:1.50;color:var(--color-text-gray);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-item:hover .news-item__title{color:rgb(var(--color-rgb-blue))}
+
+.btn-more{
+  display:flex;align-items:center;justify-content:center;position:relative;
+  width:calc(393 * var(--u));height:calc(55 * var(--u));
+  margin:calc(25 * var(--u)) auto 0;border-radius:999px;
+  background-color:rgb(var(--color-rgb-news));color:#fff;
+  border:calc(2 * var(--u)) solid rgb(var(--color-rgb-news-dark));
+  font-family:"Roboto Condensed",sans-serif;font-weight:700;font-style:italic;
+  letter-spacing:.05em;font-size:calc(25 * var(--u));
+  filter:drop-shadow(0 calc(3 * var(--u)) calc(7 * var(--u)) rgb(0 0 0 / .25));
+  transition:transform .3s var(--ease-pop);
+}
+.btn-more:hover{transform:scale(.95);transition:transform .5s var(--ease-out)}
+.btn-more:after{content:"";position:absolute;right:calc(83 * var(--u));
+  width:calc(20 * var(--u));height:calc(22 * var(--u));
+  background:no-repeat center/contain
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 22'><path d='M3 2l7 9-7 9' fill='none' stroke='white' stroke-width='3'/><path d='M10 2l7 9-7 9' fill='none' stroke='white' stroke-width='3'/></svg>")}
+.top-news__bg{position:absolute;inset:auto 0 0 0;height:100%;z-index:-1;background:#f2ffea}
+.top-news__bg img{position:absolute;bottom:0;left:0;width:100%}
+
+/* =========================================================================
+   8. ABOUT  (white title / blue accent) — 1200px tall, 16:9 movie plate
+   ========================================================================= */
+.top-about{position:relative;z-index:1;height:calc(1200 * var(--u));margin-top:calc(120 * var(--u))}
+.top-about .section-title p{color:rgb(var(--color-rgb-blue));opacity:1}
+.top-about .section-title h2{color:var(--color-text-gray)}
+.top-about__bg{position:absolute;top:0;left:0;width:100%;z-index:-1}
+.about-movie{
+  overflow:hidden;position:absolute;top:50%;left:50%;
+  transform:translate3d(-50%,-50%,0);
+  width:calc(1067 * var(--u));height:calc(600 * var(--u));
+  filter:drop-shadow(0 calc(4 * var(--u)) calc(13 * var(--u)) rgb(0 0 0 / .25));
+  transition:transform .7s .1s var(--ease-out);
+}
+.about-movie img{height:100%;object-fit:cover;transition:transform .3s cubic-bezier(.165,.84,.44,1)}
+.about-movie:after{content:"";position:absolute;inset:-1%;background:rgb(var(--color-rgb-blue));
+  opacity:0;transition:opacity .3s var(--ease-out);z-index:1}
+.about-movie:hover img{transform:scale(1.08);transition:transform 1s var(--ease-out)}
+.about-movie:hover:after{opacity:.75}
+.about-movie__play{position:absolute;top:50%;left:50%;z-index:2;
+  transform:translate3d(-50%,-50%,0);width:calc(107 * var(--u));height:calc(107 * var(--u));
+  border-radius:50%;background:rgb(var(--color-rgb-blue));
+  filter:drop-shadow(0 calc(4 * var(--u)) calc(7 * var(--u)) rgb(0 0 0 / .3))}
+.about-movie__play:after{content:"";position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);width:calc(40 * var(--u));height:calc(40 * var(--u));
+  margin-left:calc(5 * var(--u));
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M8 3l28 17L8 37z' fill='white'/></svg>") no-repeat center/contain}
+
+/* =========================================================================
+   9. GAMEPLAY (green title) — 1200px tall, 3 slides, character art + copy
+   ========================================================================= */
+.top-gameplay{position:relative;z-index:1;height:calc(1200 * var(--u))}
+.top-gameplay .section-title p{color:#2f7f27;opacity:1}
+.top-gameplay .section-title h2{color:rgb(var(--color-rgb-green))}
+.top-gameplay__bg{position:absolute;inset:0;z-index:-1;overflow:hidden}
+.top-gameplay__bg img{height:100%;object-fit:cover}
+.gameplay-slider{position:relative;height:100%;display:flex;align-items:center;justify-content:center;
+  padding-top:calc(80 * var(--u))}
+.gp-slide{display:none;align-items:center;justify-content:center;gap:calc(40 * var(--u));
+  width:calc(1500 * var(--u));margin:0 auto}
+.gp-slide.is-active{display:flex;animation:fade-in .6s var(--ease-out) both}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+.gp-slide__art{width:calc(720 * var(--u));flex:none;
+  filter:drop-shadow(0 calc(4 * var(--u)) calc(13 * var(--u)) rgb(0 0 0 / .25))}
+.gp-slide__body{flex:1;max-width:calc(620 * var(--u));color:#141414}
+.gp-slide__shots{display:flex;gap:calc(16 * var(--u));margin-bottom:calc(28 * var(--u))}
+.gp-slide__shots img{border-radius:calc(8 * var(--u));
+  box-shadow:0 calc(4 * var(--u)) calc(14 * var(--u)) rgb(0 0 0 / .25);
+  transition:transform .4s var(--ease-out)}
+.gp-slide__shots img:hover{transform:translateY(calc(-6 * var(--u)))}
+.gp-slide__copy{font-size:calc(30 * var(--u));line-height:1.45;font-weight:700;
+  font-family:"Roboto Condensed",sans-serif}
+.gp-dots{position:absolute;bottom:calc(60 * var(--u));left:0;right:0;
+  display:flex;justify-content:center;gap:calc(10 * var(--u))}
+.gp-dots button{width:calc(25 * var(--u));height:calc(25 * var(--u));border-radius:50%;
+  background:#fff;opacity:.6;transform:scale(.7);transition:all .3s var(--ease-out)}
+.gp-dots button.is-active{opacity:1;transform:scale(1);background:#fff;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25'><rect x='0' y='6' width='25' height='4'/><rect x='0' y='15' width='25' height='4'/><rect x='4' y='0' width='4' height='25'/><rect x='15' y='0' width='4' height='25'/></svg>") center/contain no-repeat;
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25'><rect x='0' y='6' width='25' height='4'/><rect x='0' y='15' width='25' height='4'/><rect x='4' y='0' width='4' height='25'/><rect x='15' y='0' width='4' height='25'/></svg>") center/contain no-repeat}
+
+/* =========================================================================
+   10. CHARACTERS (purple, diagonal stripes) — horizontal carousel
+   ========================================================================= */
+.top-characters{position:relative;z-index:1;padding:calc(60 * var(--u)) 0 calc(120 * var(--u));
+  background:#fff;overflow:hidden}
+.top-characters .section-title p{color:rgb(var(--color-rgb-characters-dark));opacity:1}
+.top-characters .section-title h2{color:rgb(var(--color-rgb-characters))}
+.top-characters__bg{position:absolute;inset:0;z-index:-1;overflow:hidden}
+.top-characters__bg .line-01{position:relative;width:100%;height:calc(1430 * var(--u));
+  background:rgb(var(--color-rgb-characters));transform-origin:top right;
+  transform:rotate(-22.5deg) scaleX(2) translateY(-80%)}
+.top-characters__bg .line-02{position:absolute;top:calc(1306 * var(--u));left:0;width:100%;
+  height:calc(306 * var(--u));background:rgb(var(--color-rgb-characters-light));
+  transform-origin:top right;transform:rotate(-22.5deg) scaleX(2)}
+.character-track{display:flex;gap:calc(30 * var(--u));margin-top:calc(80 * var(--u));
+  padding:0 calc(80 * var(--u)) calc(40 * var(--u));
+  overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;cursor:grab}
+.character-track::-webkit-scrollbar{display:none}
+.character{flex:none;width:calc(250 * var(--u));scroll-snap-align:center;text-align:center;
+  transition:transform .4s var(--ease-out)}
+.character:hover{transform:translateY(calc(-10 * var(--u)))}
+.character__mask{overflow:hidden;border-radius:calc(120 * var(--u)) calc(120 * var(--u)) calc(14 * var(--u)) calc(14 * var(--u));
+  background:linear-gradient(180deg,#fff0 40%,rgb(var(--color-rgb-characters-light)) 100%)}
+.character img{aspect-ratio:3/4;object-fit:cover;object-position:top}
+.character__name{margin-top:calc(14 * var(--u));font-family:"Roboto Condensed",sans-serif;
+  font-weight:700;font-size:calc(22 * var(--u));color:var(--color-text-gray)}
+.character__va{font-size:calc(13 * var(--u));color:var(--color-gray-2);margin-top:calc(4 * var(--u))}
+.character-track-wrap{position:relative}
+.track-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:4;
+  width:calc(46 * var(--u));height:calc(69 * var(--u));color:var(--color-text-base)}
+.track-btn svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:3}
+.track-btn.prev{left:calc(56 * var(--u))}
+.track-btn.next{right:calc(56 * var(--u))}
+.track-btn:hover{opacity:.6}
+
+/* =========================================================================
+   11. MEDIA (blue)
+   ========================================================================= */
+.top-media{position:relative;z-index:1;padding:calc(100 * var(--u)) 0 calc(140 * var(--u));
+  background:rgb(var(--color-rgb-media))}
+.top-media .section-title{background:#fff}
+.top-media .section-title p{color:rgb(var(--color-rgb-media-dark));opacity:1}
+.top-media .section-title h2{color:rgb(var(--color-rgb-media))}
+.media-card{display:block;width:calc(1200 * var(--u));margin:calc(90 * var(--u)) auto 0;
+  position:relative;border-radius:calc(20 * var(--u));overflow:hidden;
+  box-shadow:0 calc(10 * var(--u)) calc(30 * var(--u)) rgb(0 0 0 / .3);
+  transition:transform .4s var(--ease-out)}
+.media-card:hover{transform:translateY(calc(-8 * var(--u)))}
+.media-card img{aspect-ratio:16/7;object-fit:cover}
+.media-card span{position:absolute;right:calc(40 * var(--u));bottom:calc(36 * var(--u));
+  display:inline-flex;align-items:center;justify-content:center;
+  height:calc(64 * var(--u));padding:0 calc(44 * var(--u));border-radius:999px;
+  background:rgb(var(--color-rgb-media));color:#fff;
+  font-family:"Roboto Condensed",sans-serif;font-weight:700;font-style:italic;
+  font-size:calc(24 * var(--u));letter-spacing:.05em}
+
+/* =========================================================================
+   12. FOOTER
+   ========================================================================= */
+.footer{background:#fff;padding:calc(90 * var(--u)) calc(60 * var(--u)) calc(50 * var(--u));
+  color:var(--color-text-base)}
+.footer__inner{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;
+  gap:calc(40 * var(--u));max-width:calc(1400 * var(--u));margin:0 auto}
+.footer__logo{width:calc(300 * var(--u))}
+.footer__links{display:flex;flex-wrap:wrap;gap:calc(28 * var(--u))}
+.footer__links a{font-size:calc(15 * var(--u));color:var(--color-gray-2)}
+.footer__links a:hover{color:var(--color-text-gray);text-decoration:underline}
+.footer__copy{margin-top:calc(50 * var(--u));text-align:center;font-size:calc(13 * var(--u));
+  color:var(--color-gray-2);letter-spacing:.02em}
+.footer__note{max-width:calc(1400 * var(--u));margin:calc(30 * var(--u)) auto 0;
+  font-size:calc(12 * var(--u));line-height:1.7;color:var(--color-gray-2);text-align:center}
+
+/* =========================================================================
+   13. MOBILE TWEAKS
+   ========================================================================= */
+@media (max-width:899.98px){
+  .header{padding:0 calc(30 * var(--u))}
+  .header__logo{width:calc(360 * var(--u))}
+  .header__nav{display:none}
+  .header__burger{display:block;width:calc(52 * var(--u));height:calc(40 * var(--u));
+    position:relative}
+  .header__burger span{position:absolute;left:0;right:0;height:calc(5 * var(--u));
+    background:#fff;border-radius:2px;transition:transform .3s var(--ease-out),opacity .3s}
+  .header__burger span:nth-child(1){top:0}
+  .header__burger span:nth-child(2){top:calc(17 * var(--u))}
+  .header__burger span:nth-child(3){top:calc(34 * var(--u))}
+  .header.is-scrolled .header__burger span{background:var(--color-text-base)}
+  .header.is-open .header__nav{display:flex;position:fixed;inset:var(--header-h) 0 auto 0;
+    flex-direction:column;gap:calc(28 * var(--u));background:#fff;
+    padding:calc(40 * var(--u));box-shadow:0 calc(10*var(--u)) calc(20*var(--u)) rgb(0 0 0 / .15)}
+  .header.is-open .header__link{color:var(--color-text-base);font-size:calc(36 * var(--u))}
+
+  .top-kv__contents{position:absolute;top:calc(836 * var(--u));left:0;width:100%}
+  .top-kv__contents-wrap{width:calc(600 * var(--u))}
+  .store-list{justify-content:center;gap:calc(10 * var(--u))}
+  .store-list li{margin:0}
+  .store-list img{height:calc(73 * var(--u))}
+  .webstore{width:calc(420 * var(--u))}
+  .sns-list{width:calc(600 * var(--u));height:calc(64 * var(--u));margin:calc(14 * var(--u)) auto 0}
+  .sns-list dt{font-size:calc(20 * var(--u))}
+  .tga-badge{position:relative;top:auto;right:auto;width:calc(220 * var(--u));margin:calc(24 * var(--u)) auto 0}
+  .scroll-rail{display:none}
+
+  .section-title{width:calc(600 * var(--u));min-height:calc(160 * var(--u));
+    --ribon:calc(32 * var(--u));padding:calc(26 * var(--u)) 0}
+  .section-title h2{font-size:calc(56 * var(--u))}
+  .section-title p{font-size:calc(18 * var(--u))}
+
+  .top-news{margin-top:calc(-70 * var(--u));padding-bottom:calc(72 * var(--u))}
+  .top-section-box{width:calc(686 * var(--u))}
+  .top-section-box__contents{min-height:0;border-radius:calc(16 * var(--u));
+    padding:calc(56 * var(--u)) 0 calc(40 * var(--u))}
+  .news-list{padding:calc(24 * var(--u));gap:calc(20 * var(--u))}
+  .news-item{gap:calc(18 * var(--u));padding:calc(16 * var(--u))}
+  .news-item__thumb{width:calc(190 * var(--u))}
+  .news-item__title{font-size:calc(24 * var(--u))}
+  .news-item__date,.chip{font-size:calc(18 * var(--u))}
+  .btn-more{width:calc(520 * var(--u));height:calc(90 * var(--u));font-size:calc(32 * var(--u))}
+
+  .top-about{height:calc(920 * var(--u));margin-top:calc(60 * var(--u))}
+  .about-movie{width:calc(700 * var(--u));height:calc(376 * var(--u))}
+  .about-movie__play{width:calc(96 * var(--u));height:calc(96 * var(--u))}
+
+  .top-gameplay{height:auto;padding-bottom:calc(80 * var(--u))}
+  .gameplay-slider{padding-top:calc(90 * var(--u))}
+  .gp-slide{flex-direction:column;width:calc(640 * var(--u));gap:calc(24 * var(--u))}
+  .gp-slide__art{width:calc(560 * var(--u))}
+  .gp-slide__body{max-width:none}
+  .gp-slide__copy{font-size:calc(26 * var(--u))}
+  .gp-dots{bottom:calc(30 * var(--u))}
+
+  .top-characters{padding:calc(70 * var(--u)) 0 calc(90 * var(--u))}
+  .character-track{padding:0 calc(40 * var(--u));gap:calc(24 * var(--u));margin-top:calc(70 * var(--u))}
+  .character{width:calc(320 * var(--u))}
+  .character__name{font-size:calc(30 * var(--u))}
+  .character__va{font-size:calc(20 * var(--u))}
+  .track-btn{display:none}
+
+  .top-media{padding:calc(70 * var(--u)) 0 calc(90 * var(--u))}
+  .media-card{width:calc(670 * var(--u));margin-top:calc(70 * var(--u))}
+  .media-card span{height:calc(70 * var(--u));font-size:calc(24 * var(--u));right:calc(24 * var(--u));bottom:calc(24 * var(--u))}
+
+  .footer{padding:calc(70 * var(--u)) calc(40 * var(--u)) calc(40 * var(--u))}
+  .footer__inner{flex-direction:column;align-items:center;text-align:center}
+  .footer__logo{width:calc(420 * var(--u))}
+  .footer__links{justify-content:center;gap:calc(24 * var(--u))}
+  .footer__links a,.footer__copy,.footer__note{font-size:calc(20 * var(--u))}
+}
+</style>
+</head>
+<body>
+<div class="site-wrapper">
+
+  <!-- ================= HEADER ================= -->
+  <header class="header" id="header">
+    <a class="header__logo" href="#" aria-label="Umamusume: Pretty Derby home">
+      <img src="https://parts.umamusume.com/assets/images/logo_umamusume.png" alt="Umamusume: Pretty Derby">
+    </a>
+    <nav class="header__nav" aria-label="Main">
+      <a class="header__link" href="#news">News</a>
+      <a class="header__link" href="#characters">Characters</a>
+      <a class="header__link" href="#media">Media</a>
+      <a class="header__cta" href="#play">Play Now</a>
+    </nav>
+    <button class="header__burger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main>
+    <!-- ================= HERO / KEY VISUAL ================= -->
+    <section class="top-kv" id="play">
+      <picture>
+        <source media="(max-width: 899.98px)"
+                srcset="https://umamusume.com/_app/immutable/assets/01_specialweek.DtnlpFlH.webp">
+        <img class="top-kv__img" src="https://umamusume.com/_app/immutable/assets/kv.CiVddxQD.jpeg"
+             alt="Umamusume: Pretty Derby key visual" fetchpriority="high">
+      </picture>
+
+      <div class="top-kv__contents">
+        <div class="top-kv__contents-wrap">
+          <img class="top-kv__playnow" src="https://umamusume.com/_app/immutable/assets/kv_txt_playnow.D0FaPRug.png" alt="Play Now!">
+
+          <ul class="store-list">
+            <li><a href="https://store.steampowered.com/app/3224770/" target="_blank" rel="noopener">
+              <img src="https://parts.umamusume.com/assets/images/badge-steam.png" alt="Steam"></a></li>
+            <li><a href="https://apps.apple.com/us/app/umamusume-pretty-derby/id6480433538" target="_blank" rel="noopener">
+              <img src="https://parts.umamusume.com/assets/images/badge-appstore.png" alt="Download on the App Store"></a></li>
+            <li><a href="https://play.google.com/store/apps/details?id=com.cygames.umamusume" target="_blank" rel="noopener">
+              <img src="https://parts.umamusume.com/assets/images/badge-googleplay.png" alt="Get it on Google Play"></a></li>
+            <li><a href="https://play.google.com/store/apps/details?id=com.cygames.umamusume&amp;hl=en_GB" target="_blank" rel="noopener">
+              <img src="https://parts.umamusume.com/assets/images/badge-googleplaygames.png" alt="Play on PC — Google Play Games"></a></li>
+          </ul>
+
+          <a class="webstore" href="https://webstore.cygames.com/en/umamusume_en/" target="_blank" rel="noopener">
+            <img src="https://umamusume.com/_app/immutable/assets/kv_cygamesid_off.CGZkdrCk.png" alt="Cygames WebStore"
+                 onmouseover="this.src='https://umamusume.com/_app/immutable/assets/kv_cygamesid_on.DSA25dCm.png'"
+                 onmouseout="this.src='https://umamusume.com/_app/immutable/assets/kv_cygamesid_off.CGZkdrCk.png'">
+          </a>
+
+          <img class="tga-badge" src="https://umamusume.com/_app/immutable/assets/TGAmobile_winner.DJe1kMYp.png"
+               alt="The Game Awards — Best Mobile Game Winner">
+        </div>
+
+        <dl class="sns-list">
+          <dt>Official Social Media</dt>
+          <dd>
+            <a class="sns-x" href="https://x.com/umamusume_eng" target="_blank" rel="noopener" aria-label="X">
+              <img src="https://parts.umamusume.com/assets/images/sns-x.svg" alt="X"></a>
+            <a class="sns-facebook" href="https://www.facebook.com/umamusume.eng" target="_blank" rel="noopener" aria-label="Facebook">
+              <img src="https://parts.umamusume.com/assets/images/sns-facebook.svg" alt="Facebook"></a>
+            <a class="sns-youtube" href="https://www.youtube.com/@umamusume_eng" target="_blank" rel="noopener" aria-label="YouTube">
+              <img src="https://parts.umamusume.com/assets/images/sns-youtube.svg" alt="YouTube"></a>
+            <a class="sns-discord" href="https://discord.gg/umamusume-eng" target="_blank" rel="noopener" aria-label="Discord">
+              <img src="https://parts.umamusume.com/assets/images/sns-discord.svg" alt="Discord"></a>
+          </dd>
+        </dl>
+      </div>
+
+      <div class="scroll-rail" aria-hidden="true">Scroll</div>
+    </section>
+
+    <!-- ================= NEWS ================= -->
+    <section class="top-news" id="news">
+      <div class="top-news__bg"><img src="https://umamusume.com/_app/immutable/assets/news_bg.Bh8oYNXe.png" alt=""></div>
+
+      <div class="section-title">
+        <p>Latest</p>
+        <h2>News</h2>
+      </div>
+
+      <div class="top-section-box">
+        <div class="top-section-box__contents">
+          <div class="news-list">
+            <a class="news-item" href="https://umamusume.com/news/100119">
+              <div class="news-item__body">
+                <div class="news-item__meta">
+                  <span class="chip">Update</span>
+                  <span class="news-item__date">2026/11/10 10:15 (UTC)</span>
+                </div>
+                <p class="news-item__title">Issue with Racing Carnival event</p>
+              </div>
+            </a>
+            <a class="news-item" href="https://umamusume.com/news/100118">
+              <div class="news-item__body">
+                <div class="news-item__meta">
+                  <span class="chip">Update</span>
+                  <span class="news-item__date">2026/11/06 03:00 (UTC)</span>
+                </div>
+                <p class="news-item__title">Emails sent regarding reimbursement for the 7th EVENT in LOS ANGELES concerts</p>
+              </div>
+            </a>
+            <a class="news-item" href="https://umamusume.com/news/1165">
+              <img class="news-item__thumb" src="https://assets-webview-umamusume-en.akamaized.net/contents/assets/images/uploads/Thumbnail/announce_banner_3146_L1794261600.png?c=20261028021543" alt="" loading="lazy">
+              <div class="news-item__body">
+                <div class="news-item__meta">
+                  <span class="chip -game">Game</span>
+                  <span class="news-item__date">2026/11/09 22:00 (UTC)</span>
+                </div>
+                <p class="news-item__title">Spotlight Pretty Derby and Spotlight Support Card Scouts out now!</p>
+              </div>
+            </a>
+            <a class="news-item" href="https://umamusume.com/news/1159">
+              <img class="news-item__thumb" src="https://assets-webview-umamusume-en.akamaized.net/contents/assets/images/uploads/Thumbnail/banner_30100042_L1794261600.png?c=20260925060024" alt="" loading="lazy">
+              <div class="news-item__body">
+                <div class="news-item__meta">
+                  <span class="chip -game">Game</span>
+                  <span class="news-item__date">2026/11/09 22:00 (UTC)</span>
+                </div>
+                <p class="news-item__title">The story event Sweet Memories Teatime is here!</p>
+              </div>
+            </a>
+            <a class="news-item" href="https://umamusume.com/news/1168">
+              <div class="news-item__body">
+                <div class="news-item__meta">
+                  <span class="chip -game">Game</span>
+                  <span class="news-item__date">2026/11/09 22:00 (UTC)</span>
+                </div>
+                <p class="news-item__title">New title missions are here!</p>
+              </div>
+            </a>
+          </div>
+          <a class="btn-more" href="https://umamusume.com/news/">View more</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ABOUT ================= -->
+    <section class="top-about" id="about">
+      <div class="top-about__bg"><img src="https://umamusume.com/_app/immutable/assets/about_bg.CQiNXnT3.jpeg" alt=""></div>
+
+      <div class="section-title">
+        <p>Story</p>
+        <h2>About</h2>
+      </div>
+
+      <a class="about-movie js-reveal" href="https://www.youtube.com/@umamusume_eng" target="_blank" rel="noopener">
+        <img src="https://umamusume.com/_app/immutable/assets/about_thumbnail.DvTbfr6J.jpeg" alt="About Umamusume: Pretty Derby — watch the movie">
+        <span class="about-movie__play" aria-hidden="true"></span>
+      </a>
+    </section>
+
+    <!-- ================= GAMEPLAY ================= -->
+    <section class="top-gameplay" id="gameplay">
+      <div class="top-gameplay__bg">
+        <img src="https://umamusume.com/_app/immutable/assets/gameplay_bg.Bhbdtv2B.png" alt="">
+      </div>
+
+      <div class="section-title">
+        <p>Features</p>
+        <h2>Gameplay</h2>
+      </div>
+
+      <div class="gameplay-slider">
+        <div class="gp-slide is-active">
+          <img class="gp-slide__art" src="https://umamusume.com/_app/immutable/assets/gameplay_specialweek.DbgtPsGW.png" alt="">
+          <div class="gp-slide__body">
+            <div class="gp-slide__shots">
+              <img src="https://umamusume.com/_app/immutable/assets/gameplay_image_1-1.DqKsqutO.png" alt="">
+              <img src="https://umamusume.com/_app/immutable/assets/gameplay_image_1-2.Bh2iV1-Q.png" alt="">
+            </div>
+            <p class="gp-slide__copy">Lead your Umamusume to victory by choosing a training regimen that fits their needs!</p>
+          </div>
+        </div>
+
+        <div class="gp-slide">
+          <img class="gp-slide__art" src="https://umamusume.com/_app/immutable/assets/gameplay_silencesuzuka.CF-9agsU.png" alt="">
+          <div class="gp-slide__body">
+            <div class="gp-slide__shots">
+              <img src="https://umamusume.com/_app/immutable/assets/gameplay_image_2-1.CGQnQoQ9.png" alt="">
+              <img src="https://umamusume.com/_app/immutable/assets/gameplay_image_2-2.DuOVG6XG.png" alt="">
+            </div>
+            <p class="gp-slide__copy">Interact with a variety of unique Umamusume at Tracen Academy! Train together, and you just might help each other reach new heights!</p>
+          </div>
+        </div>
+
+        <div class="gp-slide">
+          <img class="gp-slide__art" src="https://umamusume.com/_app/immutable/assets/gameplay_winningticket.6_SJzSZq.png" alt="">
+          <div class="gp-slide__body">
+            <div class="gp-slide__shots">
+              <img src="https://umamusume.com/_app/immutable/assets/gameplay_image_3-1.Dn6XnF5v.png" alt="">
+              <img src="https://umamusume.com/_app/immutable/assets/gameplay_image_3-2.kL42DlwX.png" alt="">
+            </div>
+            <p class="gp-slide__copy">Up to 18 Umamusume race against each other for first place—watch them go all out as you tune in to the game's incredibly realistic live commentary.</p>
+          </div>
+        </div>
+
+        <div class="gp-dots" role="tablist" aria-label="Gameplay slides">
+          <button class="is-active" aria-label="Slide 1"></button>
+          <button aria-label="Slide 2"></button>
+          <button aria-label="Slide 3"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CHARACTERS ================= -->
+    <section class="top-characters" id="characters">
+      <div class="top-characters__bg" aria-hidden="true">
+        <div class="line-01"></div>
+        <div class="line-02"></div>
+      </div>
+
+      <div class="section-title">
+        <p>Roster</p>
+        <h2>Characters</h2>
+      </div>
+
+      <div class="character-track-wrap">
+        <button class="track-btn prev" aria-label="Previous characters">
+          <svg viewBox="0 0 46 69"><path d="M36 4L8 34.5 36 65"/></svg>
+        </button>
+
+        <div class="character-track" id="characterTrack">
+          <a class="character" href="https://umamusume.com/characters/specialweek">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1744884539/files/user/character/specialweek/specialweek_top.png" alt="Special Week" loading="lazy"></div>
+            <p class="character__name">Special Week</p><p class="character__va">VA: Azumi Waki</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/silencesuzuka">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1744884593/files/user/character/silencesuzuka/silencesuzuka_top.png" alt="Silence Suzuka" loading="lazy"></div>
+            <p class="character__name">Silence Suzuka</p><p class="character__va">VA: Marika Kohno</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/tokaiteio">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1744884573/files/user/character/tokaiteio/tokaiteio_top.png" alt="Tokai Teio" loading="lazy"></div>
+            <p class="character__name">Tokai Teio</p><p class="character__va">VA: Machico</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/maruzensky">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1744885689/files/user/character/maruzensky/maruzensky_top.png" alt="Maruzensky" loading="lazy"></div>
+            <p class="character__name">Maruzensky</p><p class="character__va">VA: Lynn</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/fujikiseki">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1744944239/files/user/character/fujikiseki/fujikiseki_top.png" alt="Fuji Kiseki" loading="lazy"></div>
+            <p class="character__name">Fuji Kiseki</p><p class="character__va">VA: Eriko Matsui</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/oguricap">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1744944401/files/user/character/oguricap/oguricap_top.png" alt="Oguri Cap" loading="lazy"></div>
+            <p class="character__name">Oguri Cap</p><p class="character__va">VA: Tomoyo Takayanagi</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/goldship">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1744944608/files/user/character/goldship/goldship_top.png" alt="Gold Ship" loading="lazy"></div>
+            <p class="character__name">Gold Ship</p><p class="character__va">VA: Hitomi Ueda</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/vodka">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1744944761/files/user/character/vodka/vodka_top.png" alt="Vodka" loading="lazy"></div>
+            <p class="character__name">Vodka</p><p class="character__va">VA: Ayaka Ohashi</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/daiwascarlet">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1744944627/files/user/character/daiwascarlet/daiwascarlet_top.png" alt="Daiwa Scarlet" loading="lazy"></div>
+            <p class="character__name">Daiwa Scarlet</p><p class="character__va">VA: Chisa Kimura</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/mejiromcqueen">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1744944706/files/user/character/mejiromcqueen/mejiromcqueen_top.png" alt="Mejiro McQueen" loading="lazy"></div>
+            <p class="character__name">Mejiro McQueen</p><p class="character__va">VA: Saori Onishi</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/winningticket">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1749211687/files/user/character/winningticket/winningticket_top.png" alt="Winning Ticket" loading="lazy"></div>
+            <p class="character__name">Winning Ticket</p><p class="character__va">VA: Yui Watanabe</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/riceshower">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1749211656/files/user/character/riceshower/riceshower_top.png" alt="Rice Shower" loading="lazy"></div>
+            <p class="character__name">Rice Shower</p><p class="character__va">VA: Manaka Iwami</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/kitasanblack">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1751255262/files/user/character/kitasanblack/kitasanblack_top.png" alt="Kitasan Black" loading="lazy"></div>
+            <p class="character__name">Kitasan Black</p><p class="character__va">VA: Hinaki Yano</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/agnestachyon">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1749211670/files/user/character/agnestachyon/agnestachyon_top.png" alt="Agnes Tachyon" loading="lazy"></div>
+            <p class="character__name">Agnes Tachyon</p><p class="character__va">VA: Sumire Uesaka</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/hokkotarumae">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1779777395/files/user/character/hokkotarumae/hokkotarumae_top.png" alt="Hokko Tarumae" loading="lazy"></div>
+            <p class="character__name">Hokko Tarumae</p><p class="character__va">VA: Sayaka Kikuchi</p>
+          </a>
+          <a class="character" href="https://umamusume.com/characters/mrcb">
+            <div class="character__mask"><img src="https://en-portal.g.kuroco-img.app/v=1768440020/files/user/character/mrcb/mrcb_top.png" alt="Mr. C.B." loading="lazy"></div>
+            <p class="character__name">Mr. C.B.</p><p class="character__va">VA: Yurina Amami</p>
+          </a>
+        </div>
+
+        <button class="track-btn next" aria-label="Next characters">
+          <svg viewBox="0 0 46 69"><path d="M10 4l28 30.5L10 65"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= MEDIA ================= -->
+    <section class="top-media" id="media">
+      <div class="section-title">
+        <p>Anime / Music</p>
+        <h2>Media</h2>
+      </div>
+
+      <a class="media-card" href="https://umamusume.com/media/">
+        <img src="https://umamusume.com/_app/immutable/assets/media_image.bZStKUoL.png" alt="Umamusume media — anime and music">
+        <span>Explore</span>
+      </a>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <img class="footer__logo" src="https://parts.umamusume.com/assets/images/logo_umamusume.png" alt="Umamusume: Pretty Derby">
+      <nav class="footer__links" aria-label="Footer">
+        <a href="https://umamusume.com/news/">News</a>
+        <a href="https://umamusume.com/characters/">Characters</a>
+        <a href="https://umamusume.com/media/">Media</a>
+        <a href="https://webstore.cygames.com/en/umamusume_en/" target="_blank" rel="noopener">Cygames WebStore</a>
+        <a href="https://x.com/umamusume_eng" target="_blank" rel="noopener">X</a>
+      </nav>
+    </div>
+    <p class="footer__note">© Cygames, Inc. All rights reserved. This is a non-commercial reference clone created for study; all artwork, trademarks and characters belong to Cygames, Inc.</p>
+    <p class="footer__copy">UMAMUSUME: PRETTY DERBY</p>
+  </footer>
+</div>
+
+<script>
+/* ---------- sticky header ---------- */
+const header = document.getElementById('header');
+const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 80);
+addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+/* ---------- mobile menu ---------- */
+const burger = header.querySelector('.header__burger');
+burger?.addEventListener('click', () => {
+  const open = header.classList.toggle('is-open');
+  burger.setAttribute('aria-expanded', open);
+});
+
+/* ---------- scroll reveal ---------- */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-show'); io.unobserve(e.target); } });
+}, {rootMargin: '0px 0px -15% 0px'});
+document.querySelectorAll('.js-reveal, .section-title, .top-section-box, .character-track').forEach(el => {
+  el.classList.add('js-reveal'); io.observe(el);
+});
+
+/* ---------- gameplay slider ---------- */
+const slides = [...document.querySelectorAll('.gp-slide')];
+const dots = [...document.querySelectorAll('.gp-dots button')];
+let current = 0, timer;
+function go(i){
+  current = (i + slides.length) % slides.length;
+  slides.forEach((s, n) => s.classList.toggle('is-active', n === current));
+  dots.forEach((d, n) => d.classList.toggle('is-active', n === current));
+}
+dots.forEach((d, i) => d.addEventListener('click', () => { go(i); restart(); }));
+function restart(){ clearInterval(timer); timer = setInterval(() => go(current + 1), 7000); }
+restart();
+
+/* ---------- character carousel arrows ---------- */
+const track = document.getElementById('characterTrack');
+document.querySelector('.track-btn.prev')?.addEventListener('click', () =>
+  track.scrollBy({left: -track.clientWidth * .8, behavior:'smooth'}));
+document.querySelector('.track-btn.next')?.addEventListener('click', () =>
+  track.scrollBy({left: track.clientWidth * .8, behavior:'smooth'}));
+
+/* drag to scroll (pointer) */
+let down = false, startX = 0, startScroll = 0;
+track.addEventListener('pointerdown', e => { down = true; startX = e.clientX; startScroll = track.scrollLeft; track.setPointerCapture(e.pointerId); });
+track.addEventListener('pointermove', e => { if (!down) return; track.scrollLeft = startScroll - (e.clientX - startX); });
+track.addEventListener('pointerup', () => { down = false; });
+</script>
+</body>
+</html>
