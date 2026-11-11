@@ -1,0 +1,110 @@
+{
+  "site": "https://umamusume.com/",
+  "captured": "2026-11-10",
+  "notes": "Vite hashes change on redeploy; if a hash 404s, re-scrape the HTML for /_app/immutable/assets/ URLs. Character/media art lives on en-portal.g.kuroco-img.app and the v= query param is an optional cache-buster.",
+  "brand": {
+    "base": "https://parts.umamusume.com/assets/images/",
+    "files": {
+      "logo": "logo_umamusume.png",
+      "app_icon": "app_icon.png",
+      "badge_steam": "badge-steam.png",
+      "badge_appstore": "badge-appstore.png",
+      "badge_googleplay": "badge-googleplay.png",
+      "badge_googleplaygames": "badge-googleplaygames.png",
+      "sns_x": "sns-x.svg",
+      "sns_facebook": "sns-facebook.svg",
+      "sns_youtube": "sns-youtube.svg",
+      "sns_discord": "sns-discord.svg"
+    }
+  },
+  "home": {
+    "base": "https://umamusume.com/_app/immutable/assets/",
+    "images": {
+      "kv_desktop": "kv.CiVddxQD.jpeg",
+      "kv_phone": "01_specialweek.DtnlpFlH.webp",
+      "playnow_wordmark": "kv_txt_playnow.D0FaPRug.png",
+      "webstore_hover": "kv_cygamesid_on.DSA25dCm.png",
+      "webstore_default": "kv_cygamesid_off.CGZkdrCk.png",
+      "webstore_alt": "kv_cygamesid.C4xTPo0s.png",
+      "tga_award": "TGAmobile_winner.DJe1kMYp.png",
+      "news_bg": "news_bg.Bh8oYNXe.png",
+      "about_thumbnail": "about_thumbnail.DvTbfr6J.jpeg",
+      "about_bg": "about_bg.CQiNXnT3.jpeg",
+      "gameplay_bg": "gameplay_bg.Bhbdtv2B.png",
+      "gameplay_art_1": "gameplay_specialweek.DbgtPsGW.png",
+      "gameplay_art_2": "gameplay_silencesuzuka.CF-9agsU.png",
+      "gameplay_art_3": "gameplay_winningticket.6_SJzSZq.png",
+      "gameplay_shot_1a": "gameplay_image_1-1.DqKsqutO.png",
+      "gameplay_shot_1b": "gameplay_image_1-2.Bh2iV1-Q.png",
+      "gameplay_shot_2a": "gameplay_image_2-1.CGQnQoQ9.png",
+      "gameplay_shot_2b": "gameplay_image_2-2.DuOVG6XG.png",
+      "gameplay_shot_3a": "gameplay_image_3-1.Dn6XnF5v.png",
+      "gameplay_shot_3b": "gameplay_image_3-2.kL42DlwX.png",
+      "media_card": "media_image.bZStKUoL.png",
+      "pattern_bg": "bg.BorAeoXQ.jpeg"
+    },
+    "svg_decor": {
+      "rail_divider": "teitetsu.BNI5mUfy.svg",
+      "pill_edge_base": "decoration_base.ax2DgMiQ.svg",
+      "pill_edge_square": "decoration_square.CPV5Y4-u.svg",
+      "arrow_double": "arrow_double.nHmJyBTy.svg",
+      "icon_play": "icon_play.DDT9Nirq.svg"
+    }
+  },
+  "characters": {
+    "base": "https://en-portal.g.kuroco-img.app",
+    "path_patterns": [
+      "/v={timestamp}/files/user/character/{slug}/{slug}_top.png",
+      "/v={timestamp}/files/user/character/{slug}/{slug}_list.png"
+    ],
+    "exceptions": {
+      "riceshower": "riceshower_01_list.png",
+      "happymeek": "happymik_list.png",
+      "ksmiracle": "k.s.miracle_top.png"
+    },
+    "home_carousel": [
+      { "name": "Special Week", "va": "Azumi Waki", "slug": "specialweek", "v": "1744884539" },
+      { "name": "Silence Suzuka", "va": "Marika Kohno", "slug": "silencesuzuka", "v": "1744884593" },
+      { "name": "Tokai Teio", "va": "Machico", "slug": "tokaiteio", "v": "1744884573" },
+      { "name": "Maruzensky", "va": "Lynn", "slug": "maruzensky", "v": "1744885689" },
+      { "name": "Fuji Kiseki", "va": "Eriko Matsui", "slug": "fujikiseki", "v": "1744944239" },
+      { "name": "Oguri Cap", "va": "Tomoyo Takayanagi", "slug": "oguricap", "v": "1744944401" },
+      { "name": "Gold Ship", "va": "Hitomi Ueda", "slug": "goldship", "v": "1744944608" },
+      { "name": "Vodka", "va": "Ayaka Ohashi", "slug": "vodka", "v": "1744944761" },
+      { "name": "Daiwa Scarlet", "va": "Chisa Kimura", "slug": "daiwascarlet", "v": "1744944627" },
+      { "name": "Mejiro McQueen", "va": "Saori Onishi", "slug": "mejiromcqueen", "v": "1744944706" },
+      { "name": "Winning Ticket", "va": "Yui Watanabe", "slug": "winningticket", "v": "1749211687" },
+      { "name": "Rice Shower", "va": "Manaka Iwami", "slug": "riceshower", "v": "1749211656" },
+      { "name": "Kitasan Black", "va": "Hinaki Yano", "slug": "kitasanblack", "v": "1751255262" },
+      { "name": "Agnes Tachyon", "va": "Sumire Uesaka", "slug": "agnestachyon", "v": "1749211670" },
+      { "name": "Hokko Tarumae", "va": "Sayaka Kikuchi", "slug": "hokkotarumae", "v": "1779777395" }
+    ]
+  },
+  "news_thumbnails": {
+    "base": "https://assets-webview-umamusume-en.akamaized.net/contents/assets/images/uploads/Thumbnail/",
+    "examples": [
+      "announce_banner_3146_L1794261600.png?c=20261028021543",
+      "banner_30100042_L1794261600.png?c=20260925060024",
+      "banner_30320202_L1794088800.png?c=20260925035415",
+      "announce_banner_3144_L1793916000.png?c=20260925035632"
+    ]
+  },
+  "fonts": [
+    "https://parts.cygames.co.jp/assets/fonts/Roboto-VariableFont_wdth,wght.woff2",
+    "https://parts.cygames.co.jp/assets/fonts/RobotoCondensed-VariableFont_wght.woff2"
+  ],
+  "links": {
+    "steam": "https://store.steampowered.com/app/3224770/",
+    "app_store": "https://apps.apple.com/us/app/umamusume-pretty-derby/id6480433538",
+    "google_play": "https://play.google.com/store/apps/details?id=com.cygames.umamusume",
+    "google_play_games": "https://play.google.com/store/apps/details?id=com.cygames.umamusume&hl=en_GB",
+    "cygames_webstore": "https://webstore.cygames.com/en/umamusume_en/",
+    "x": "https://x.com/umamusume_eng",
+    "facebook": "https://www.facebook.com/umamusume.eng",
+    "youtube": "https://www.youtube.com/@umamusume_eng",
+    "discord": "https://discord.gg/umamusume-eng",
+    "news": "https://umamusume.com/news/",
+    "characters": "https://umamusume.com/characters/",
+    "media": "https://umamusume.com/media/"
+  }
+}
