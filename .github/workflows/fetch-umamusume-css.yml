@@ -19,7 +19,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add clones/umamusume.com/_raw/css clones/umamusume.com/_raw/additional-css-fetch.json
+          git add clones/umamusume.com/_raw/css clones/umamusume.com/_raw/external/parts.umamusume.com/assets/css clones/umamusume.com/_raw/additional-css-fetch.json
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'chore(clone): archive additional CSS chunks [skip ci]'
           git push origin "HEAD:${GITHUB_REF_NAME}"

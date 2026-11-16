@@ -5,10 +5,16 @@ import concurrent.futures, hashlib, json, pathlib, re, urllib.request
 out = pathlib.Path('clones/umamusume.com/_raw')
 app = (out / 'js/app.D_SVNIEA.js').read_text()
 names = sorted(set(re.findall(r'[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.css', app)))
+names += ['header.7t5x1aId.css', 'footer.DrBbS_Io.css']
 manifest = {}
 def fetch(name):
-    url = 'https://umamusume.com/_app/immutable/assets/' + name
-    dst = out / 'css' / name
+    if name.startswith(('header.', 'footer.')):
+        url = 'https://parts.umamusume.com/assets/css/' + name
+        dst = out / 'external/parts.umamusume.com/assets/css' / name
+        dst.parent.mkdir(parents=True, exist_ok=True)
+    else:
+        url = 'https://umamusume.com/_app/immutable/assets/' + name
+        dst = out / 'css' / name
     if dst.exists():
         return name, {'status': 'already archived'}
     errors = []
