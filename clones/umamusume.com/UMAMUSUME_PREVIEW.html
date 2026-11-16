@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umamusume-inspired style preview</title>
+<style>
+/* Standalone visual adaptation, not official source or a complete site clone.
+   Colors and component ideas are based on the archived production CSS. */
+:root {
+  color-scheme: light;
+  --ink: #4d4d4d;
+  --blue: rgb(42, 93, 250);
+  --pink: rgb(255, 121, 208);
+  --purple: rgb(140, 131, 255);
+  --green: rgb(60, 167, 50);
+  --sky: rgb(76, 174, 255);
+  --soft: #f1efff;
+  --ease: cubic-bezier(.19, 1, .22, 1);
+  font-family: Arial, Helvetica, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #fff; color: var(--ink); line-height: 1.5; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 3px solid #141414; outline-offset: 4px; }
+.notice { padding: 9px 18px; text-align: center; color: #42435b; background: #f1efff; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 24px; max-width: 1400px; margin: auto; padding: 19px 6%; }
+.brand { text-decoration: none; display: inline-flex; align-items: center; gap: 10px; line-height: 1; color: var(--blue); font-weight: 900; letter-spacing: -.06em; font-style: italic; font-size: clamp(20px, 2.5vw, 30px); }
+.brand-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: white; background: var(--pink); font-size: 22px; font-style: normal; }
+.nav { display: flex; align-items: center; justify-content: end; flex-wrap: wrap; gap: clamp(16px, 3vw, 42px); }
+.nav a { color: #555b74; text-decoration: none; text-transform: uppercase; font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+.nav a:hover { color: var(--blue); }
+.hero { position: relative; overflow: hidden; min-height: 520px; display: flex; align-items: center; background: linear-gradient(118deg, #f9fffb 0%, #eaf8ff 46%, #e8e2ff 100%); }
+.hero::before { content: ""; position: absolute; inset: 0; opacity: .35; background-image: radial-gradient(#9bc9f0 1.5px, transparent 1.5px); background-size: 20px 20px; mask-image: linear-gradient(90deg, transparent 30%, #000); }
+.hero::after { content: ""; position: absolute; width: 570px; height: 570px; right: -90px; top: -120px; border: 70px solid #ffffffa8; border-radius: 50%; }
+.hero-inner { position: relative; z-index: 1; width: min(1120px, 88%); margin: 0 auto; display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 30px; padding: 60px 0; }
+.eyebrow { display: inline-block; color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+h1 { margin: 13px 0 16px; color: #434367; font-size: clamp(44px, 6.5vw, 82px); line-height: .98; font-style: italic; letter-spacing: -.065em; }
+h1 span { color: var(--blue); }
+.hero p { max-width: 470px; margin: 0 0 28px; color: #68728a; font-weight: 600; }
+.button { display: inline-flex; justify-content: center; align-items: center; min-height: 52px; padding: 12px 34px; border: 2px solid currentColor; border-radius: 999px; background: white; color: var(--blue); text-decoration: none; font-size: 14px; font-weight: 800; letter-spacing: .05em; box-shadow: 0 3px 9px #0003; transition: transform .3s cubic-bezier(.175,.885,.32,1.275); }
+.button::after { content: "→"; margin-left: 24px; }
+@media (hover: hover) and (pointer: fine) { .button:hover { transform: scale(.95); transition: transform .5s var(--ease); } .card:hover { transform: scale(.98); } }
+.art { position: relative; min-height: 360px; display: grid; place-items: center; }
+.art-circle { display: grid; place-items: center; width: min(300px, 75vw); aspect-ratio: 1; border: 12px solid #fff; border-radius: 50%; background: linear-gradient(145deg, #a8dfff, #aaa0ff); box-shadow: 0 16px 40px #596aa32b; transform: rotate(-10deg); }
+.art-circle span { display: block; color: white; font-size: clamp(95px, 15vw, 175px); line-height: 1; text-shadow: 0 5px 0 #ffffff4d; }
+.spark { position: absolute; color: #fff; font-size: 50px; text-shadow: 0 2px 8px #a1b2d2; }
+.spark.one { top: 25px; right: 8%; } .spark.two { bottom: 38px; left: 6%; font-size: 32px; }
+.ribbon { position: absolute; right: 0; bottom: 38px; padding: 8px 30px; background: var(--pink); color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .15em; transform: rotate(-5deg); box-shadow: 0 3px 8px #0002; }
+main { overflow: hidden; }
+.section { max-width: 1120px; margin: auto; padding: 84px 6%; }
+.section-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 30px; }
+.kicker { margin: 0; color: var(--pink); text-transform: uppercase; letter-spacing: .18em; font-size: 12px; font-weight: 900; }
+h2 { margin: 2px 0 0; font-size: clamp(32px, 4vw, 46px); line-height: 1.1; font-style: italic; letter-spacing: -.04em; color: #4b4f6c; }
+.section-head > p { margin: 0; color: #878ca0; font-size: 13px; }
+.news-wrap { background: #f7f9ff; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.card { overflow: hidden; border-radius: 12px; background: #fff; box-shadow: 0 3px 12px #0002; transition: transform .3s cubic-bezier(.175,.885,.32,1.275); }
+.card-visual { display: flex; align-items: center; justify-content: center; min-height: 140px; color: white; font-size: 52px; font-weight: 900; letter-spacing: -.06em; font-style: italic; }
+.card-visual.pink { background: linear-gradient(135deg, #ffb4dd, #ff79d0); }
+.card-visual.blue { background: linear-gradient(135deg, #9adfff, #4caeff); }
+.card-visual.purple { background: linear-gradient(135deg, #c6bbff, #8c83ff); }
+.card-body { padding: 20px; }
+.tag { display: inline-block; padding: 3px 10px; color: white; background: var(--pink); border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: .08em; }
+.tag.blue { background: var(--sky); } .tag.purple { background: var(--purple); }
+.card h3 { margin: 12px 0 7px; color: #4d4d4d; font-size: 16px; line-height: 1.35; }
+.card p { margin: 0; color: #85899a; font-size: 13px; }
+.center { text-align: center; margin-top: 36px; }
+.section-title { display: inline-block; position: relative; margin-bottom: 26px; padding: 12px 38px; color: white; background: var(--purple); transform: skew(-15deg); box-shadow: 3px 4px 12px #0003; }
+.section-title span { display: block; transform: skew(15deg); font-size: 24px; font-weight: 900; font-style: italic; }
+.patterns { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 50px; }
+.patterns p { max-width: 510px; color: #707489; }
+.palette { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.swatch { height: 105px; border-radius: 15px; display: grid; place-items: end center; padding: 12px; color: #fff; font-size: 11px; font-weight: 900; letter-spacing: .08em; box-shadow: 0 3px 9px #0002; }
+.swatch:nth-child(1) { background: var(--pink); } .swatch:nth-child(2) { background: var(--purple); } .swatch:nth-child(3) { background: var(--sky); }
+.footer { padding: 40px 6%; text-align: center; color: #fff; background: #4caeff; }
+.footer strong { font-size: 20px; font-style: italic; letter-spacing: -.04em; }
+.footer p { margin: 8px 0 0; font-size: 12px; }
+@media (max-width: 899.98px) {
+  .header { padding: 16px 5%; } .nav { gap: 12px; } .nav a { font-size: 10px; }
+  .hero { min-height: 0; } .hero-inner { grid-template-columns: 1fr 1fr; padding: 60px 0; }
+  .art { min-height: 250px; } .art-circle { width: min(240px, 34vw); border-width: 8px; }
+  .art-circle span { font-size: clamp(60px, 12vw, 120px); } .ribbon { right: -20px; bottom: 10px; }
+  .cards { gap: 12px; } .section { padding: 60px 5%; }
+}
+@media (max-width: 600px) {
+  .header { align-items: flex-start; flex-direction: column; gap: 13px; } .nav { justify-content: start; }
+  .hero-inner { grid-template-columns: 1fr; padding: 48px 0 38px; gap: 14px; }
+  .art { min-height: 210px; } .art-circle { width: 210px; } .art-circle span { font-size: 100px; }
+  .spark.one { right: 18%; } .spark.two { left: 18%; } .ribbon { right: 5%; }
+  .cards, .patterns { grid-template-columns: 1fr; } .patterns { gap: 24px; }
+  .card-visual { min-height: 125px; } .section-head { align-items: start; flex-direction: column; gap: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+<div class="notice">FAN-MADE STYLE PREVIEW · An adaptation for visual reference, not the official website</div>
+<header class="header" id="top">
+  <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">✦</span> UMA STYLE</a>
+  <nav class="nav" aria-label="Preview navigation"><a href="#news">News</a><a href="#colors">Colors</a><a href="#about">About</a></nav>
+</header>
+<main>
+  <section class="hero" id="about">
+    <div class="hero-inner">
+      <div><span class="eyebrow">A bright new adventure ✦</span><h1>Ready, set,<br><span>shine!</span></h1><p>A playful preview of the colors, rounded cards, energetic banners, and soft motion inspired by Umamusume.com.</p><a class="button" href="#news">EXPLORE THE STYLE</a></div>
+      <div class="art" aria-hidden="true"><span class="spark one">✦</span><div class="art-circle"><span>★</span></div><span class="spark two">✦</span><span class="ribbon">LET'S GO!</span></div>
+    </div>
+  </section>
+  <div class="news-wrap"><section class="section" id="news">
+    <div class="section-head"><div><p class="kicker">What's happening</p><h2>NEWS &amp; UPDATES</h2></div><p>Example content for this preview</p></div>
+    <div class="cards">
+      <article class="card"><div class="card-visual pink" aria-hidden="true">NEWS ✦</div><div class="card-body"><span class="tag">NEWS</span><h3>A little sparkle for every day</h3><p>Rounded surfaces and a cheerful pink accent.</p></div></article>
+      <article class="card"><div class="card-visual blue" aria-hidden="true">MEDIA ♪</div><div class="card-body"><span class="tag blue">MEDIA</span><h3>Colorful moments in motion</h3><p>Bright blue details and soft shadows.</p></div></article>
+      <article class="card"><div class="card-visual purple" aria-hidden="true">STAR ★</div><div class="card-body"><span class="tag purple">CHARACTERS</span><h3>Meet the stars of the show</h3><p>A playful purple palette with bold type.</p></div></article>
+    </div><div class="center"><a class="button" href="#colors">VIEW THE COLORS</a></div>
+  </section></div>
+  <section class="section patterns" id="colors"><div><div class="section-title"><span>COLOR &amp; ENERGY</span></div><p>Pink, purple, and blue accents pair with clean white surfaces, skewed banners, and pill-shaped buttons. This page uses simple placeholder artwork so it can be opened offline.</p></div><div class="palette" aria-label="Sample pink, purple, and blue color palette"><div class="swatch">NEWS</div><div class="swatch">CHARACTERS</div><div class="swatch">MEDIA</div></div></section>
+</main>
+<footer class="footer"><strong>THANKS FOR STOPPING BY! ✦</strong><p>Independent visual preview · Not affiliated with or endorsed by the website owners.</p></footer>
+</body>
+</html>
