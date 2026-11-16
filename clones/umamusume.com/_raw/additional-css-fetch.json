@@ -1,0 +1,117 @@
+{
+  "0.CeerEmeO.css": {
+    "status": "already archived"
+  },
+  "1.BFJOTM7r.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/1.BFJOTM7r.css"
+  },
+  "10.DDdQ9x9h.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/10.DDdQ9x9h.css"
+  },
+  "11.DpuLNhxI.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/11.DpuLNhxI.css"
+  },
+  "13.C5zC1YlV.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/13.C5zC1YlV.css"
+  },
+  "14.CsweyMWT.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/14.CsweyMWT.css"
+  },
+  "15.H1nngETr.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/15.H1nngETr.css"
+  },
+  "2.BtMVfDfi.css": {
+    "status": "already archived"
+  },
+  "3.BNAmx9Tx.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/3.BNAmx9Tx.css"
+  },
+  "4.DBnK5a_4.css": {
+    "status": "already archived"
+  },
+  "5.awmcU7ut.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/5.awmcU7ut.css"
+  },
+  "6.C6qUA8MI.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/6.C6qUA8MI.css"
+  },
+  "7.CJGj11PN.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/7.CJGj11PN.css"
+  },
+  "8.CadhOIyJ.css": {
+    "status": "already archived"
+  },
+  "9.CVDkr8qk.css": {
+    "status": "already archived"
+  },
+  "BreadCrumb.DaR8leF4.css": {
+    "errors": [
+      "HTTPError: HTTP Error 403: Forbidden",
+      "HTTPError: HTTP Error 429: Too Many Requests"
+    ],
+    "status": "failed",
+    "url": "https://umamusume.com/_app/immutable/assets/BreadCrumb.DaR8leF4.css"
+  },
+  "ButtonBase.DAU0tdJM.css": {
+    "status": "already archived"
+  },
+  "LowerLayout.OrFN1E7Y.css": {
+    "status": "already archived"
+  },
+  "Modal.DqwlE6Qt.css": {
+    "status": "already archived"
+  },
+  "NewsItem.BW2Y3wsu.css": {
+    "status": "already archived"
+  }
+}
