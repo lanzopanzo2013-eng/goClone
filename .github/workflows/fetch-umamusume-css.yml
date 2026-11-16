@@ -1,0 +1,52 @@
+name: fetch-umamusume-css
+
+# One-shot (re-runnable) archival job: pulls the official umamusume.com
+# stylesheets, the assets they reference and a provenance manifest.
+# Writes into clones/umamusume.com/_raw/ and commits back to the same branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: branch to commit the fetched files to
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    env:
+      BASE_REF: ${{ inputs.branch || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Show connectivity
+        run: |
+          curl -sS -o /dev/null -w "umamusume.com -> %{http_code}\n" --max-time 30 https://umamusume.com/ || true
+
+      - name: Fetch stylesheets
+        run: |
+          python3 .github/scripts/fetch_umamusume_css.py
+
+      - name: Report
+        run: |
+          du -sh clones/umamusume.com/_raw || true
+          ls -l clones/umamusume.com/_raw/css || true
+
+      - name: Commit back
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BASE_REF"
+          git add -A clones/umamusume.com/_raw
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "chore(clone): archive official umamusume.com stylesheets [skip ci]"
+            git push origin "HEAD:$BASE_REF"
+          fi
