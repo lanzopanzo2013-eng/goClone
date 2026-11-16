@@ -32,14 +32,22 @@ jobs:
           curl -sS -o /dev/null -w "wayback web.archive.org -> %{http_code}\n" --max-time 30 https://web.archive.org/ || true
 
       - name: Fetch stylesheets + assets
-        run: python3 .github/scripts/fetch_umamusume_css.py
+        run: |
+          set +e
+          python3 -u .github/scripts/fetch_umamusume_css.py > /tmp/fetch.log 2>&1
+          echo "exit=$?"
+          mkdir -p clones/umamusume.com/_raw
+          cp /tmp/fetch.log clones/umamusume.com/_raw/fetch.log
+          tail -40 /tmp/fetch.log || true
+          du -sh clones/umamusume.com/_raw || true
 
       - name: Report
         run: |
-          du -sh clones/umamusume.com/_raw || true
-          head -c 400 clones/umamusume.com/_raw/FETCH_MANIFEST.json || true
+          echo '--- summary ---'
+          python3 -c "import json;m=json.load(open('clones/umamusume.com/_raw/FETCH_MANIFEST.json'));print(m['counts'],m['total_bytes'])" 2>/dev/null || true
 
       - name: Commit back to the triggering branch
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -48,5 +56,5 @@ jobs:
             echo "nothing to commit"
           else
             git commit -m "chore(clone): archive official umamusume.com stylesheets [skip ci]"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}" || (git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}")
           fi
