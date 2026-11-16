@@ -1,0 +1,64 @@
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/)
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/)
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/)
+  -> Wayback fallback for https://umamusume.com/
+  ! HTTPError: HTTP Error 429: Too Many Requests (https://web.archive.org/web/2026id_/https://umamusume.com/)
+  ! HTTPError: HTTP Error 429: Too Many Requests (https://web.archive.org/web/2026id_/https://umamusume.com/)
+  FAILED https://umamusume.com/
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/news/)
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/news/)
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/news/)
+  -> Wayback fallback for https://umamusume.com/news/
+  ! URLError: <urlopen error [Errno 111] Connection refused> (https://web.archive.org/web/2026id_/https://umamusume.com/news/)
+  ! URLError: <urlopen error [Errno 111] Connection refused> (https://web.archive.org/web/2026id_/https://umamusume.com/news/)
+  FAILED https://umamusume.com/news/
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/news/1092)
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/news/1092)
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/news/1092)
+  -> Wayback fallback for https://umamusume.com/news/1092
+  ! URLError: <urlopen error [Errno 111] Connection refused> (https://web.archive.org/web/2026id_/https://umamusume.com/news/1092)
+  ! URLError: <urlopen error [Errno 111] Connection refused> (https://web.archive.org/web/2026id_/https://umamusume.com/news/1092)
+  FAILED https://umamusume.com/news/1092
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/characters/)
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/characters/)
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/characters/)
+  -> Wayback fallback for https://umamusume.com/characters/
+  ! HTTPError: HTTP Error 429: Too Many Requests (https://web.archive.org/web/2026id_/https://umamusume.com/characters/)
+  ! HTTPError: HTTP Error 429: Too Many Requests (https://web.archive.org/web/2026id_/https://umamusume.com/characters/)
+  FAILED https://umamusume.com/characters/
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/media/)
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/media/)
+  ! HTTPError: HTTP Error 403: Forbidden (https://umamusume.com/media/)
+  -> Wayback fallback for https://umamusume.com/media/
+  ! HTTPError: HTTP Error 429: Too Many Requests (https://web.archive.org/web/2026id_/https://umamusume.com/media/)
+  ! URLError: <urlopen error [Errno 111] Connection refused> (https://web.archive.org/web/2026id_/https://umamusume.com/media/)
+  FAILED https://umamusume.com/media/
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/js/header/index.html)
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/js/header/index.html)
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/js/header/index.html)
+  -> Wayback fallback for https://parts.umamusume.com/assets/js/header/index.html
+  ! URLError: <urlopen error [Errno 111] Connection refused> (https://web.archive.org/web/2026id_/https://parts.umamusume.com/assets/js/header/index.html)
+  ! URLError: <urlopen error [Errno 111] Connection refused> (https://web.archive.org/web/2026id_/https://parts.umamusume.com/assets/js/header/index.html)
+  FAILED https://parts.umamusume.com/assets/js/header/index.html
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/js/footer/index.html)
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/js/footer/index.html)
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/js/footer/index.html)
+  -> Wayback fallback for https://parts.umamusume.com/assets/js/footer/index.html
+  ! URLError: <urlopen error _ssl.c:1063: The handshake operation timed out> (https://web.archive.org/web/2026id_/https://parts.umamusume.com/assets/js/footer/index.html)
+  ! HTTPError: HTTP Error 429: Too Many Requests (https://web.archive.org/web/2026id_/https://parts.umamusume.com/assets/js/footer/index.html)
+  FAILED https://parts.umamusume.com/assets/js/footer/index.html
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/fonts/Roboto-VariableFont_wdth,wght.woff2)
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/fonts/Roboto-VariableFont_wdth,wght.woff2)
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/fonts/Roboto-VariableFont_wdth,wght.woff2)
+  -> Wayback fallback for https://parts.umamusume.com/assets/fonts/Roboto-VariableFont_wdth,wght.woff2
+  ! HTTPError: HTTP Error 404: NOT FOUND (https://web.archive.org/web/2026id_/https://parts.umamusume.com/assets/fonts/Roboto-VariableFont_wdth,wght.woff2)
+  ! URLError: <urlopen error [Errno 111] Connection refused> (https://web.archive.org/web/2026id_/https://parts.umamusume.com/assets/fonts/Roboto-VariableFont_wdth,wght.woff2)
+  FAILED https://parts.umamusume.com/assets/fonts/Roboto-VariableFont_wdth,wght.woff2
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/fonts/RobotoCondensed-VariableFont_wght.woff2)
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/fonts/RobotoCondensed-VariableFont_wght.woff2)
+  ! HTTPError: HTTP Error 404: Not Found (https://parts.umamusume.com/assets/fonts/RobotoCondensed-VariableFont_wght.woff2)
+  -> Wayback fallback for https://parts.umamusume.com/assets/fonts/RobotoCondensed-VariableFont_wght.woff2
+  ! URLError: <urlopen error [Errno 111] Connection refused> (https://web.archive.org/web/2026id_/https://parts.umamusume.com/assets/fonts/RobotoCondensed-VariableFont_wght.woff2)
+  ! URLError: <urlopen error [Errno 111] Connection refused> (https://web.archive.org/web/2026id_/https://parts.umamusume.com/assets/fonts/RobotoCondensed-VariableFont_wght.woff2)
+  FAILED https://parts.umamusume.com/assets/fonts/RobotoCondensed-VariableFont_wght.woff2
+nothing fetched
