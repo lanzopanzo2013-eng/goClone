@@ -7,6 +7,8 @@ app = (out / 'js/app.D_SVNIEA.js').read_text()
 names = sorted(set(re.findall(r'[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.css', app)))
 names += ['header.7t5x1aId.css', 'footer.DrBbS_Io.css']
 manifest = {}
+previous_path = out / 'additional-css-fetch.json'
+previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
 def fetch(name):
     if name.startswith(('header.', 'footer.')):
         url = 'https://parts.umamusume.com/assets/css/' + name
@@ -16,6 +18,9 @@ def fetch(name):
         url = 'https://umamusume.com/_app/immutable/assets/' + name
         dst = out / 'css' / name
     if dst.exists():
+        entry = previous.get(name, {})
+        if entry.get('status') == 'fetched' and hashlib.sha256(dst.read_bytes()).hexdigest() == entry.get('sha256'):
+            return name, entry
         return name, {'status': 'already archived'}
     errors = []
     for candidate in (url, 'https://web.archive.org/web/2026id_/' + url):
