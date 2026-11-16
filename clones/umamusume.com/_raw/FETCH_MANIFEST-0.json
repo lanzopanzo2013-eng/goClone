@@ -1,0 +1,138 @@
+{
+  "fetched_utc": "2026-11-16T07:32:55Z",
+  "files": {
+    "css/0.CeerEmeO.css": {
+      "bytes": 33628,
+      "kind": "css",
+      "sha256": "64a582775f828c403e56a8eb0c32d1f172b318b5d071120f539590d8ae4253e2",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/assets/0.CeerEmeO.css",
+      "url": "https://umamusume.com/_app/immutable/assets/0.CeerEmeO.css"
+    },
+    "css/2.BtMVfDfi.css": {
+      "bytes": 63801,
+      "kind": "css",
+      "sha256": "ab54432538d4246141d25f09110e1e130ce4bc5d887fe0b01965607b563e5271",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/assets/2.BtMVfDfi.css",
+      "url": "https://umamusume.com/_app/immutable/assets/2.BtMVfDfi.css"
+    },
+    "css/8.CadhOIyJ.css": {
+      "bytes": 25980,
+      "kind": "css",
+      "sha256": "97cdba9e0662187717e108734457687196814570250308a4424e7348fec0a115",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/assets/8.CadhOIyJ.css",
+      "url": "https://umamusume.com/_app/immutable/assets/8.CadhOIyJ.css"
+    },
+    "external/cdn01.stright.bizris.com/js/cookie_consent_block.js": {
+      "bytes": 4114,
+      "kind": "js",
+      "sha256": "8778870ae04f2be56f1da1aab43e6063dd1eca11cff60a1f6a737db31e053624",
+      "source": "https://cdn01.stright.bizris.com/js/cookie_consent_block.js",
+      "url": "https://cdn01.stright.bizris.com/js/cookie_consent_block.js"
+    },
+    "external/cdn01.stright.bizris.com/js/cookie_consent_setting.js": {
+      "bytes": 4790,
+      "kind": "js",
+      "sha256": "fedcfa8c004d3603e495571ebb8de2913b358427ec3e99d2bad198f7ce3d0423",
+      "source": "https://cdn01.stright.bizris.com/js/cookie_consent_setting.js",
+      "url": "https://cdn01.stright.bizris.com/js/cookie_consent_setting.js"
+    },
+    "external/parts.cygames.co.jp/assets/fonts/RobotoCondensed-VariableFont_wght.woff2": {
+      "bytes": 174352,
+      "kind": "asset",
+      "sha256": "1eee0b576980ec9734e7175a952f59d17e0fe79e37ca3ee919970df7b479ec9f",
+      "source": "https://parts.cygames.co.jp/assets/fonts/RobotoCondensed-VariableFont_wght.woff2",
+      "url": "https://parts.cygames.co.jp/assets/fonts/RobotoCondensed-VariableFont_wght.woff2"
+    },
+    "external/parts.cygames.co.jp/assets/images/logo_cygames.svg": {
+      "bytes": 2529,
+      "kind": "asset",
+      "sha256": "e6c4e9fe3baf2c73b85d1c79fa54fc9633ccbc776dd50ff85b7ec6988bc35d8c",
+      "source": "https://parts.cygames.co.jp/assets/images/logo_cygames.svg",
+      "url": "https://parts.cygames.co.jp/assets/images/logo_cygames.svg"
+    },
+    "external/parts.umamusume.com/assets/images/badge-googleplay.png": {
+      "bytes": 8821,
+      "kind": "asset",
+      "sha256": "e5eab3cc0938aabefef94a3d164249b26914c53a8c547d64df6632e7a412cfbe",
+      "source": "https://parts.umamusume.com/assets/images/badge-googleplay.png",
+      "url": "https://parts.umamusume.com/assets/images/badge-googleplay.png"
+    },
+    "img/bg_title.HYB_fX5K.png": {
+      "bytes": 216522,
+      "kind": "asset",
+      "sha256": "c903d17e3300213154ca34eae4085b2108aaa136b9acce5a81275ee84dd71dcc",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/assets/bg_title.HYB_fX5K.png",
+      "url": "https://umamusume.com/_app/immutable/assets/bg_title.HYB_fX5K.png"
+    },
+    "img/title_music.DrOssGOV.png": {
+      "bytes": 13118,
+      "kind": "asset",
+      "sha256": "26ca7f89d987b69a55fdc6fd0a73cbe835844839ce2434c451440eb699c0cdf8",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/assets/title_music.DrOssGOV.png",
+      "url": "https://umamusume.com/_app/immutable/assets/title_music.DrOssGOV.png"
+    },
+    "js/SplideArrows.Blb13VIZ.js": {
+      "bytes": 31865,
+      "kind": "js",
+      "sha256": "51f54c4770baf3ffc08c5fa6b938c1d7cb51f84fcb909aeaa7d8c506b2650f40",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/SplideArrows.Blb13VIZ.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/SplideArrows.Blb13VIZ.js"
+    },
+    "js/define-built-in-accessor.Bwmms25D.js": {
+      "bytes": 11065,
+      "kind": "js",
+      "sha256": "d5984b97de44a18c1e2abf37837fb2c4838384f416b1e2b2ca75932c381e3311",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/define-built-in-accessor.Bwmms25D.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/define-built-in-accessor.Bwmms25D.js"
+    },
+    "js/index.DVzMnug1.js": {
+      "bytes": 544,
+      "kind": "js",
+      "sha256": "241ebbb2af13025e0e6396a2e685f6f7bc7481a9c52522fcaa89cfaff0e41ba9",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/index.DVzMnug1.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/index.DVzMnug1.js"
+    },
+    "js/stores.6ZBtQuxL.js": {
+      "bytes": 233,
+      "kind": "js",
+      "sha256": "dc1ce930a945e2ddd58612c01e0bd43bba2eef8f38bea063c8e25b5594ec54bf",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/stores.6ZBtQuxL.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/stores.6ZBtQuxL.js"
+    },
+    "js/utils.CzcsYEkL.js": {
+      "bytes": 7135,
+      "kind": "js",
+      "sha256": "3c38ae6fa38cb8f8a0ba225ffe4b5d499739f4977d363c39abe9a7dd74e573fa",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/utils.CzcsYEkL.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/utils.CzcsYEkL.js"
+    },
+    "js/utils.DIP20kk2.js": {
+      "bytes": 188,
+      "kind": "js",
+      "sha256": "ce39dcf9e7f17213498d337c46ea927f9278113afcedd9d00296b40ad9cca4e6",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/utils.DIP20kk2.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/utils.DIP20kk2.js"
+    },
+    "site/visitingstables-guidelines/index.html": {
+      "bytes": 15467,
+      "kind": "page",
+      "sha256": "54c021bbe207c3ecb4c3332e7799d794d7a712eb05ca7510744042e3ad98e396",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/visitingstables-guidelines/",
+      "url": "https://umamusume.com/visitingstables-guidelines/"
+    },
+    "svg/decoration_base.ax2DgMiQ.svg": {
+      "bytes": 274,
+      "kind": "asset",
+      "sha256": "14cb52595a66b3b5c29e1374bf03e310a21f34238344ef68e9e33deae2c0427f",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/assets/decoration_base.ax2DgMiQ.svg",
+      "url": "https://umamusume.com/_app/immutable/assets/decoration_base.ax2DgMiQ.svg"
+    }
+  },
+  "shard": "0/3",
+  "site": "https://umamusume.com",
+  "stats": {
+    "fail": 8,
+    "ok": 18,
+    "wayback": 13
+  }
+}
