@@ -1,9 +1,6 @@
 name: fetch-umamusume-css
 on:
   workflow_dispatch:
-  push:
-    branches: ["arena/**"]
-    paths: [".github/scripts/fetch_umamusume_css.py", ".github/workflows/fetch-umamusume-css.yml"]
 permissions:
   contents: write
 jobs:
@@ -23,3 +20,6 @@ jobs:
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'chore(clone): archive additional CSS chunks [skip ci]'
           git push origin "HEAD:${GITHUB_REF_NAME}"
+      - name: Report known stylesheet coverage
+        if: always()
+        run: python3 clones/umamusume.com/verify_archive.py
