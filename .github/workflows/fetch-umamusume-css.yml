@@ -1,16 +1,19 @@
 name: fetch-umamusume-css
 
-# One-shot (re-runnable) archival job: pulls the official umamusume.com
-# stylesheets, the assets they reference and a provenance manifest.
-# Writes into clones/umamusume.com/_raw/ and commits back to the same branch.
+# One-shot archival job: pulls the official umamusume.com stylesheets (byte-exact),
+# the assets those stylesheets reference, the rendered pages, and a provenance
+# manifest (sha256 per file). Runs on a GitHub runner because it has open
+# internet access, then commits the result back to the branch that triggered it.
 
 on:
+  push:
+    branches:
+      - "arena/**"
+      - "main"
+    paths:
+      - ".github/workflows/fetch-umamusume-css.yml"
+      - ".github/scripts/fetch_umamusume_css.py"
   workflow_dispatch:
-    inputs:
-      branch:
-        description: branch to commit the fetched files to
-        required: false
-        default: ""
 
 permissions:
   contents: write
@@ -18,35 +21,32 @@ permissions:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    env:
-      BASE_REF: ${{ inputs.branch || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Show connectivity
+      - name: Check connectivity
         run: |
-          curl -sS -o /dev/null -w "umamusume.com -> %{http_code}\n" --max-time 30 https://umamusume.com/ || true
+          curl -sS -o /dev/null -w "live   umamusume.com -> %{http_code}\n" --max-time 30 https://umamusume.com/ || true
+          curl -sS -o /dev/null -w "wayback web.archive.org -> %{http_code}\n" --max-time 30 https://web.archive.org/ || true
 
-      - name: Fetch stylesheets
-        run: |
-          python3 .github/scripts/fetch_umamusume_css.py
+      - name: Fetch stylesheets + assets
+        run: python3 .github/scripts/fetch_umamusume_css.py
 
       - name: Report
         run: |
           du -sh clones/umamusume.com/_raw || true
-          ls -l clones/umamusume.com/_raw/css || true
+          head -c 400 clones/umamusume.com/_raw/FETCH_MANIFEST.json || true
 
-      - name: Commit back
+      - name: Commit back to the triggering branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B "$BASE_REF"
           git add -A clones/umamusume.com/_raw
           if git diff --cached --quiet; then
             echo "nothing to commit"
           else
             git commit -m "chore(clone): archive official umamusume.com stylesheets [skip ci]"
-            git push origin "HEAD:$BASE_REF"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
