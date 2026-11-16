@@ -3,11 +3,11 @@
     "status": "already archived"
   },
   "1.BFJOTM7r.css": {
-    "errors": [
-      "HTTPError: HTTP Error 403: Forbidden",
-      "HTTPError: HTTP Error 429: Too Many Requests"
-    ],
-    "status": "failed",
+    "bytes": 5531,
+    "final_url": "https://web.archive.org/web/20261113072528id_/https://umamusume.com/_app/immutable/assets/1.BFJOTM7r.css",
+    "sha256": "4d68abb705d1ea7cba47eab8cf05d0c1191e657ad6347499ee115f4caa117f60",
+    "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/assets/1.BFJOTM7r.css",
+    "status": "fetched",
     "url": "https://umamusume.com/_app/immutable/assets/1.BFJOTM7r.css"
   },
   "10.DDdQ9x9h.css": {
@@ -113,5 +113,21 @@
   },
   "NewsItem.BW2Y3wsu.css": {
     "status": "already archived"
+  },
+  "footer.DrBbS_Io.css": {
+    "bytes": 15009,
+    "final_url": "https://parts.umamusume.com/assets/css/footer.DrBbS_Io.css",
+    "sha256": "3d7f5999223f58799389a60a43563187eaabbfa4631fdffa8b29ffef9a17d37d",
+    "source": "https://parts.umamusume.com/assets/css/footer.DrBbS_Io.css",
+    "status": "fetched",
+    "url": "https://parts.umamusume.com/assets/css/footer.DrBbS_Io.css"
+  },
+  "header.7t5x1aId.css": {
+    "bytes": 18539,
+    "final_url": "https://parts.umamusume.com/assets/css/header.7t5x1aId.css",
+    "sha256": "951fbc38894236095624940fad06f91a6aed2718f8e748100781915babd752e4",
+    "source": "https://parts.umamusume.com/assets/css/header.7t5x1aId.css",
+    "status": "fetched",
+    "url": "https://parts.umamusume.com/assets/css/header.7t5x1aId.css"
   }
 }
