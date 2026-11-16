@@ -1,0 +1,145 @@
+{
+  "fetched_utc": "2026-11-16T07:32:39Z",
+  "files": {
+    "css/NewsItem.BW2Y3wsu.css": {
+      "bytes": 9614,
+      "kind": "css",
+      "sha256": "a00e4e5fccd3468ee55a4f2ebf1a066798cfdf0304124ad04813573590c6e771",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/assets/NewsItem.BW2Y3wsu.css",
+      "url": "https://umamusume.com/_app/immutable/assets/NewsItem.BW2Y3wsu.css"
+    },
+    "external/parts.cygames.co.jp/assets/fonts/Roboto-VariableFont_wdth,wght.woff2": {
+      "bytes": 216620,
+      "kind": "asset",
+      "sha256": "8d98c580860bf9210b9fd8b24da3f96cc2a53eaccc0ef12a74e418747fef53e0",
+      "source": "https://parts.cygames.co.jp/assets/fonts/Roboto-VariableFont_wdth,wght.woff2",
+      "url": "https://parts.cygames.co.jp/assets/fonts/Roboto-VariableFont_wdth,wght.woff2"
+    },
+    "external/parts.cygames.co.jp/assets/images/cygames_copyright_regular.svg": {
+      "bytes": 3749,
+      "kind": "asset",
+      "sha256": "092ae68fd77fda413422e686c1013483ac66d45376fe795500f9bfc862ca741b",
+      "source": "https://parts.cygames.co.jp/assets/images/cygames_copyright_regular.svg",
+      "url": "https://parts.cygames.co.jp/assets/images/cygames_copyright_regular.svg"
+    },
+    "external/parts.umamusume.com/assets/images/app_icon.png": {
+      "bytes": 513750,
+      "kind": "asset",
+      "sha256": "422f52106a9af0e67cb1b2728d084f80389c568b58ef36c6451ea90ce448eb53",
+      "source": "https://parts.umamusume.com/assets/images/app_icon.png",
+      "url": "https://parts.umamusume.com/assets/images/app_icon.png"
+    },
+    "external/parts.umamusume.com/assets/images/badge-googleplaygames.png": {
+      "bytes": 20271,
+      "kind": "asset",
+      "sha256": "1060b067421ce0d22e2d93e6d341ebb4d62cea242891a7f9d95433e4c83deb6a",
+      "source": "https://parts.umamusume.com/assets/images/badge-googleplaygames.png",
+      "url": "https://parts.umamusume.com/assets/images/badge-googleplaygames.png"
+    },
+    "external/parts.umamusume.com/assets/images/sns-discord.svg": {
+      "bytes": 1301,
+      "kind": "asset",
+      "sha256": "88d5f05052f093116d4d0a332dfb007e2646c18793305f7014451f599c5cf6b7",
+      "source": "https://parts.umamusume.com/assets/images/sns-discord.svg",
+      "url": "https://parts.umamusume.com/assets/images/sns-discord.svg"
+    },
+    "js/0.DXE6C1_U.js": {
+      "bytes": 11625,
+      "kind": "js",
+      "sha256": "b3952bd1b9cb5b8b380a5ee3a368bf353b60c43812de3f21fc65d74dce4accc3",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/nodes/0.DXE6C1_U.js",
+      "url": "https://umamusume.com/_app/immutable/nodes/0.DXE6C1_U.js"
+    },
+    "js/4.lQuG_FRA.js": {
+      "bytes": 9955,
+      "kind": "js",
+      "sha256": "7002796895f01b86ac4b5c8b3c9f677c0fc216364eeb5de664b18ff2e272da70",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/nodes/4.lQuG_FRA.js",
+      "url": "https://umamusume.com/_app/immutable/nodes/4.lQuG_FRA.js"
+    },
+    "js/Modal._HbaW0to.js": {
+      "bytes": 4391,
+      "kind": "js",
+      "sha256": "0e23487e5f92832f0da2316a5d27080bd0af6e2fd007a4fb9ea8b108f103ea9e",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/Modal._HbaW0to.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/Modal._HbaW0to.js"
+    },
+    "js/characters.LbYt7TUN.js": {
+      "bytes": 6381,
+      "kind": "js",
+      "sha256": "171859b57a15e7217773033cafdb08273f7e32db39044d84a67781542784ffbf",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/characters.LbYt7TUN.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/characters.LbYt7TUN.js"
+    },
+    "js/entry.DJoUTggi.js": {
+      "bytes": 27045,
+      "kind": "js",
+      "sha256": "36499332206885b726089973867fff60506527c46b54259f50f540c9b7720121",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/entry.DJoUTggi.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/entry.DJoUTggi.js"
+    },
+    "js/legacy.DyHf_tnI.js": {
+      "bytes": 47,
+      "kind": "js",
+      "sha256": "92f26680b4d1eade2c13395f2f9875575b941be719f124a6b57b29f4bbb8e074",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/legacy.DyHf_tnI.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/legacy.DyHf_tnI.js"
+    },
+    "js/proxy.Dj-bYjhI.js": {
+      "bytes": 2138,
+      "kind": "js",
+      "sha256": "b5261468ed38ead0fc51ec612b1d3ef5f94ed6a41f7ecf96304f0233caa966cc",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/proxy.Dj-bYjhI.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/proxy.Dj-bYjhI.js"
+    },
+    "js/render.CY3llFOx.js": {
+      "bytes": 1723,
+      "kind": "js",
+      "sha256": "f5842377c8d157f5004bc9c9c4d85c0c14c63d4631a280762127ff48039a13c3",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/render.CY3llFOx.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/render.CY3llFOx.js"
+    },
+    "js/runtime.C1npiaW1.js": {
+      "bytes": 13394,
+      "kind": "js",
+      "sha256": "976756b87de346c1e678351bc1b46cc4f51de44fe6088986a416a3cb8d061298",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/runtime.C1npiaW1.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/runtime.C1npiaW1.js"
+    },
+    "js/store.CBsiZq9K.js": {
+      "bytes": 779,
+      "kind": "js",
+      "sha256": "8362e69c4f54d96eb8fbb3916a39e301c3431c206f08b6685b4083f4db94d909",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/chunks/store.CBsiZq9K.js",
+      "url": "https://umamusume.com/_app/immutable/chunks/store.CBsiZq9K.js"
+    },
+    "site/media/index.html": {
+      "bytes": 16280,
+      "kind": "page",
+      "sha256": "df52aa5f4079533ce12da155891036272ecb383f4b572bccf1b0a9c1312a8282",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/media/",
+      "url": "https://umamusume.com/media/"
+    },
+    "site/policy/index.html": {
+      "bytes": 59130,
+      "kind": "page",
+      "sha256": "88865ebb0e4d7d3d031b422d694069b1cb6e62b21e79618692b528c46cedf2d9",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/policy/",
+      "url": "https://umamusume.com/policy/"
+    },
+    "svg/icon_search.CTVh2p5-.svg": {
+      "bytes": 386,
+      "kind": "asset",
+      "sha256": "8829d341ba781155426309b88f45f8a8686773da04cff74467643a7238386e91",
+      "source": "https://web.archive.org/web/2026id_/https://umamusume.com/_app/immutable/assets/icon_search.CTVh2p5-.svg",
+      "url": "https://umamusume.com/_app/immutable/assets/icon_search.CTVh2p5-.svg"
+    }
+  },
+  "shard": "2/3",
+  "site": "https://umamusume.com",
+  "stats": {
+    "fail": 14,
+    "ok": 19,
+    "wayback": 14
+  }
+}
