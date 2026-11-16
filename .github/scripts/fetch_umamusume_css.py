@@ -1,33 +1,42 @@
 #!/usr/bin/env python3
 """
-Archive the official umamusume.com stylesheets (and everything they reference),
-byte-for-byte.
+Archive the official umamusume.com stylesheets (and what they reference), byte-for-byte.
 
-Why a GitHub runner: the authoring sandbox used for this repo is firewalled to a
-handful of hosts, so this job runs where there is open internet access.
+Why a GitHub runner: the authoring sandbox for this repo is firewalled to a handful
+of hosts, so this job runs where there is open internet access.
 
-What it pulls
--------------
-1. Rendered pages (``/``, ``/news/``, a news article, ``/characters/``, ``/media/``).
-2. Every ``/_app/immutable/**`` stylesheet and JS chunk those pages reference,
-   recursively following chunk-to-chunk imports (SvelteKit splits CSS per route).
-3. The shared Cygames header/footer web component partials served from
-   ``parts.umamusume.com/assets/js/{header,footer}/index.html`` — plus whatever
-   CSS/JS/images they reference — because the footer is *not* in the page CSS.
-4. Fonts and small decorative assets referenced from CSS ``url()``.
+Design notes
+------------
+* ``clones/umamusume.com/_urls.txt`` is the crawl frontier (one URL per line). It was
+  seeded from a successful crawl; new URLs discovered in fetched documents are written
+  to ``new-urls-<slug>.txt`` and merged back into the frontier.
+* CloudFront in front of umamusume.com scores requests and returns 403 to anything that
+  looks like a script, so we (a) send a full browser header set, (b) spread requests
+  across processes with a delay, (c) retry with backoff, and (d) fall back to the
+  Wayback "id_" raw endpoint which serves the archived bytes unmodified.
+* The job is sharded by URL hash: every shard writes only its own files, so shards run
+  as parallel jobs and never race on the same path.
 
-Everything is written verbatim under ``clones/umamusume.com/_raw/`` with a
-``FETCH_MANIFEST.json`` (sha256 + byte size + source URL) for provenance.
-Nothing is reformatted or reconstructed.
+Output (verbatim bytes only, nothing reformatted):
+
+    _raw/css/*.css        production stylesheets
+    _raw/js/*.js          SvelteKit chunks (per-route CSS links + footer component)
+    _raw/fonts/*.woff2    the two Roboto variable fonts
+    _raw/svg/, img/       decorative vectors and small images referenced by CSS/HTML
+    _raw/site/**          rendered HTML for every public route
+    _raw/external/**      assets served from parts.umamusume.com / parts.cygames.co.jp
+    _raw/FETCH_MANIFEST.json  kind, byte size, sha256 and source URL per file
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
-import re
-import shutil
+import os
+import queue
+import random
 import sys
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -35,88 +44,73 @@ from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "clones" / "umamusume.com" / "_raw"
-ORIGIN = "https://umamusume.com"
-PARTS = "https://parts.umamusume.com"
+SITE_DIR = ROOT / "clones" / "umamusume.com"
+OUT = SITE_DIR / "_raw"
+FRONTIER = SITE_DIR / "_urls.txt"
 WAYBACK = "https://web.archive.org/web/2026id_/"
+
+SHARD = os.environ.get("SHARD", "").strip()          # "i/n" or empty
+SHARD_INDEX, SHARD_COUNT = (0, 1)
+if SHARD:
+    a, b = SHARD.split("/")
+    SHARD_INDEX, SHARD_COUNT = int(a), int(b)
 
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 )
+HEADERS = {
+    "User-Agent": UA,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
+    "image/avif,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
+    "Sec-Ch-Ua": '"Chromium";v="131", "Not_A Brand";v="24", "Google Chrome";v="131"',
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Ch-Ua-Platform": '"Windows"',
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
+    "Referer": "https://umamusume.com/",
+}
 
-PAGES = ["/", "/news/", "/news/1092", "/characters/", "/media/"]
-PARTS_PAGES = [
-    PARTS + "/assets/js/header/index.html",
-    PARTS + "/assets/js/footer/index.html",
-]
+CSS_ASSET_RE = __import__("re").compile(r"url\(\s*['\"]?(?!data:|//)([^'\")]+)['\"]?\s*\)")
+HTML_REF_RE = __import__("re").compile(r"(?:src|href|data-src)=\"([^\"]+)\"")
+JS_REF_RE = __import__("re").compile(
+    r"[\"'`]([A-Za-z0-9_./@%\-]+\.(?:css|js|svg|png|jpe?g|webp|woff2?))[\"'`]"
+)
+ABS_RE = __import__("re").compile(
+    r"https?://[A-Za-z0-9_.\-]+/[A-Za-z0-9_./@%\-]+\.(?:css|js|svg|png|jpe?g|webp|woff2?)"
+)
+BAD = __import__("re").compile(
+    r"(umami|gtag|googletagmanager|google-analytics|doubleclick|sentry|hotjar|stright\.bizris|\.map$)"
+)
+ALLOWED_HOSTS = {"umamusume.com", "parts.umamusume.com", "parts.cygames.co.jp"}
 
-# /_app/immutable/assets/x.HASH.css  or  /_app/immutable/chunks/x.HASH.js
-IMMUTABLE_RE = re.compile(r"/_app/immutable/[A-Za-z0-9_./@\-]+\.(?:css|js)")
-# svelte/vite mentions css siblings by bare filename inside a chunk
-CSS_NAME_RE = re.compile(r"[\"']([A-Za-z0-9_.\-]+\.css)[\"']")
-# url(...) inside a stylesheet
-CSS_ASSET_RE = re.compile(r"url\(\s*['\"]?(?!data:|//)([^'\")]+)['\"]?\s*\)")
-# src= / href= / srcset= inside HTML
-HTML_REF_RE = re.compile(r"(?:src|href)=\"([^\"]+)\"")
-# quoted asset paths inside JS
-JS_REF_RE = re.compile(r"[\"'`]([A-Za-z0-9_./@%\-]+\.(?:css|js|svg|png|jpe?g|webp|woff2?))[\"'`]")
-ABS_RE = re.compile(r"https?://[A-Za-z0-9_.\-]+/[A-Za-z0-9_./@%\-]+\.(?:css|js|svg|png|jpe?g|webp|woff2?)")
-
-BAD = re.compile(r"(umami|gtag|googletagmanager|google-analytics|doubleclick|sentry|hotjar|stright\.bizris)")
-TRACKING = re.compile(r"(\.map$)")
-
-
-def get(url: str, tries: int = 3) -> bytes | None:
-    for i in range(tries):
-        req = urllib.request.Request(
-            url,
-            headers={
-                "User-Agent": UA,
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
-                "image/avif,image/webp,image/apng,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.9",
-                "Cache-Control": "no-cache",
-                "Sec-Fetch-Dest": "document",
-                "Sec-Fetch-Mode": "navigate",
-                "Sec-Fetch-Site": "none",
-                "Upgrade-Insecure-Requests": "1",
-            },
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=60) as r:
-                if r.status == 200:
-                    return r.read()
-                print(f"  ! HTTP {r.status} {url}", file=sys.stderr)
-        except Exception as e:  # noqa: BLE001
-            print(f"  ! {type(e).__name__}: {e} ({url})", file=sys.stderr)
-        time.sleep(1.5 * (i + 1))
-    return None
+LOCK = threading.Lock()
+MANIFEST: dict[str, dict] = {}
+DISCOVERED: set[str] = set()
+STATS = {"ok": 0, "fail": 0, "wayback": 0}
 
 
-def fetch(path_or_url: str, wayback: bool = True) -> tuple[bytes | None, str]:
-    """Live first, then the Wayback raw endpoint. Returns (bytes, source)."""
-    url = path_or_url if path_or_url.startswith("http") else ORIGIN + path_or_url
-    b = get(url)
-    if b:
-        return b, url
-    if not wayback:
-        return None, ""
-    print(f"  -> Wayback fallback for {url}", file=sys.stderr)
-    b = get(WAYBACK + url, tries=2)
-    return (b, WAYBACK + url) if b else (None, "")
+def is_shard(url: str) -> bool:
+    if SHARD_COUNT <= 1:
+        return True
+    return int(hashlib.sha1(url.encode()).hexdigest(), 16) % SHARD_COUNT == SHARD_INDEX
 
 
 def rel_for(url: str) -> str:
-    """Map a URL to a stable path under _raw/ (no collisions, readable)."""
     p = urlparse(url)
     path = p.path
-    name = path.rsplit("/", 1)[-1] or "index.html"
+    name = path.rsplit("/", 1)[-1]
     ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
 
-    if p.netloc and p.netloc != "umamusume.com":
-        outer = f"external/{p.netloc}" + (path.rsplit("/", 1)[0] if "/" in path else "")
-        return f"{outer}/{name}"
+    if p.netloc and p.netloc not in ("umamusume.com", "www.umamusume.com"):
+        parent = path.rsplit("/", 1)[0] if "/" in path else ""
+        return f"external/{p.netloc}{parent}/{name or 'index.html'}"
 
     bucket = {
         "css": "css",
@@ -135,136 +129,163 @@ def rel_for(url: str) -> str:
     }.get(ext)
     if bucket:
         return f"{bucket}/{name}"
-    # documents -> site/<path>[/index.html]
-    if not name or ext not in ("html", "htm", "json", "txt", "xml", "webmanifest"):
-        name = "index.html" if not path.endswith("/") else "index.html"
-    if path.endswith("/"):
-        return "site/" + path.lstrip("/") + name
-    if "." in path.rsplit("/", 1)[-1]:
+    if not name:
+        return "site/" + path.lstrip("/") + "index.html"
+    if ext in ("html", "htm", "json", "txt", "xml"):
         return "site/" + path.lstrip("/")
     return "site/" + path.lstrip("/") + "/index.html"
 
 
-class Archive:
-    def __init__(self) -> None:
-        self.manifest: dict[str, dict] = {}
-        self.queue: list[tuple[str, str]] = []  # (url, kind)
-        self.seen: set[str] = set()
+def http_get(url: str, timeout: int = 45) -> bytes | None:
+    req = urllib.request.Request(url, headers=HEADERS)
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            if r.status == 200:
+                return r.read()
+    except urllib.error.HTTPError as e:
+        if e.code in (403, 429, 500, 502, 503, 504):
+            raise
+        return None
+    except Exception as e:  # noqa: BLE001
+        print(f"    ! {type(e).__name__}: {e}", file=sys.stderr)
+        return None
+    return None
 
-    def enqueue(self, url: str, kind: str) -> None:
-        if not url or BAD.search(url) or TRACKING.search(url):
+
+def fetch(url: str) -> tuple[bytes | None, str]:
+    """Live first (with patient backoff — 403 is bot scoring, not absence), then Wayback."""
+    live_attempts = 6
+    for i in range(live_attempts):
+        try:
+            data = http_get(url)
+            if data is not None:
+                return data, url
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                break
+            print(f"    ! HTTP {e.code} (attempt {i+1})", file=sys.stderr)
+        time.sleep(min(2 ** i, 20) * (1 + random.random()))
+    # Wayback raw replay
+    wb = WAYBACK + url
+    for i in range(3):
+        try:
+            data = http_get(wb, timeout=60)
+            if data is not None:
+                with LOCK:
+                    STATS["wayback"] += 1
+                return data, wb
+        except urllib.error.HTTPError as e:
+            print(f"    ! wayback HTTP {e.code}", file=sys.stderr)
+            if e.code == 404:
+                break
+        except Exception as e:  # noqa: BLE001
+            print(f"    ! wayback {type(e).__name__}", file=sys.stderr)
+        time.sleep(2 + 2 * i)
+    return None, ""
+
+
+def discover(url: str, data: bytes) -> None:
+    ext = urlparse(url).path.rsplit(".", 1)[-1].lower() if "." in urlparse(url).path else ""
+    text = data.decode("utf-8", "replace")
+    refs: list[str] = []
+    if ext in ("html", "htm", "") or url.endswith("/"):
+        refs += HTML_REF_RE.findall(text)
+        refs += ABS_RE.findall(text)
+    if ext == "css":
+        refs += ABS_RE.findall(text)
+        refs += [urljoin(url, r) for r in CSS_ASSET_RE.findall(text)]
+    if ext == "js":
+        refs += ABS_RE.findall(text)
+        refs += [urljoin(url, r) for r in JS_REF_RE.findall(text)]
+    for ref in refs:
+        ref = ref.split("?")[0].split("#")[0].strip()
+        if not ref or BAD.search(ref):
+            continue
+        if not ref.startswith("http"):
+            ref = urljoin(url, ref)
+        if urlparse(ref).netloc not in ALLOWED_HOSTS:
+            continue
+        with LOCK:
+            if ref not in DISCOVERED:
+                DISCOVERED.add(ref)
+
+
+def worker(urls: "queue.Queue[str]") -> None:
+    while True:
+        try:
+            url = urls.get_nowait()
+        except queue.Empty:
             return
-        if url.startswith(("data:", "mailto:", "tel:", "javascript:", "#")):
-            return
-        if url not in self.seen:
-            self.seen.add(url)
-            self.queue.append((url, kind))
-
-    def save(self, url: str, data: bytes, source: str, kind: str) -> str:
-        rel = rel_for(url)
-        dest = OUT / rel
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_bytes(data)
-        self.manifest[rel] = {
-            "kind": kind,
-            "bytes": len(data),
-            "sha256": hashlib.sha256(data).hexdigest(),
-            "source": source,
-            "url": url,
-        }
-        print(f"  + {rel} ({len(data)} B)")
-        return rel
-
-    def discover(self, url: str, data: bytes, kind: str) -> None:
+        kind = "asset"
         ext = urlparse(url).path.rsplit(".", 1)[-1].lower() if "." in urlparse(url).path else ""
-        text = data.decode("utf-8", "replace")
-        refs: list[str] = []
+        if ext in ("html", "htm", "") or url.endswith("/"):
+            kind = "page"
+        elif ext == "css":
+            kind = "css"
+        elif ext == "js":
+            kind = "js"
 
-        if kind == "page" or ext in ("html", "htm"):
-            refs += HTML_REF_RE.findall(text)
-            refs += ABS_RE.findall(text)
-        if ext == "css":
-            refs += ABS_RE.findall(text)
-            for ref in CSS_ASSET_RE.findall(text):
-                ref = ref.split("?")[0].split("#")[0]
-                if ref.startswith("data:"):
-                    continue
-                refs.append(urljoin(url, ref))
-        if ext == "js":
-            refs += ABS_RE.findall(text)
-            refs += [urljoin(url, r) for r in JS_REF_RE.findall(text)]
-            refs += [urljoin(ORIGIN + "/_app/immutable/assets/", n) for n in CSS_NAME_RE.findall(text)]
-
-        for ref in refs:
-            ref = ref.split("?")[0].split("#")[0].strip()
-            if not ref:
-                continue
-            if ref.startswith("/"):
-                # absolute path: stays on the host that served the referrer
-                ref = urljoin(url, ref)
-            elif not ref.startswith("http"):
-                ref = urljoin(url, ref)
-            host = urlparse(ref).netloc
-            if host not in ("umamusume.com", "parts.umamusume.com"):
-                continue
-            self.enqueue(ref, "asset")
-
-    def run(self, max_files: int = 600) -> None:
-        while self.queue and len(self.manifest) < max_files:
-            url, kind = self.queue.pop(0)
-            data, source = fetch(url)
-            if not data:
-                print(f"  FAILED {url}", file=sys.stderr)
-                continue
-            ext = urlparse(url).path.rsplit(".", 1)[-1].lower() if "." in urlparse(url).path else ""
-            real_kind = (
-                "page"
-                if ext in ("html", "htm", "")
-                else {"css": "css", "js": "js"}.get(ext, "asset")
-            )
-            self.save(url, data, source, real_kind)
-            self.discover(url, data, real_kind)
+        data, source = fetch(url)
+        if data is None:
+            with LOCK:
+                STATS["fail"] += 1
+            print(f"  x FAILED {url}", file=sys.stderr)
+        else:
+            rel = rel_for(url)
+            dest = OUT / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(data)
+            with LOCK:
+                MANIFEST[rel] = {
+                    "kind": kind,
+                    "bytes": len(data),
+                    "sha256": hashlib.sha256(data).hexdigest(),
+                    "source": source,
+                    "url": url,
+                }
+                STATS["ok"] += 1
+            print(f"  + {rel} ({len(data)} B) {'' if source == url else '[wayback]'}")
+            discover(url, data)
+        time.sleep(0.4 + random.random() * 0.8)  # be a polite crawler
+        urls.task_done()
 
 
 def main() -> int:
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    OUT.mkdir(parents=True, exist_ok=True)
+    targets = [ln.strip() for ln in FRONTIER.read_text().splitlines() if ln.strip() and not ln.startswith("#")]
+    targets = [t for t in targets if is_shard(t)]
+    print(f"shard {SHARD or 'all'}: {len(targets)} urls")
 
-    ar = Archive()
+    q: "queue.Queue[str]" = queue.Queue()
+    for t in targets:
+        q.put(t)
 
-    # 1. seed with the rendered pages and the shared header/footer partials
-    for pg in PAGES:
-        ar.enqueue(ORIGIN + pg, "page")
-    for pp in PARTS_PAGES:
-        ar.enqueue(pp, "page")
-    # known webfonts (referenced from @font-face with a cross-origin URL that
-    # some proxies strip out of the CSS text)
-    ar.enqueue(PARTS + "/assets/fonts/Roboto-VariableFont_wdth,wght.woff2", "asset")
-    ar.enqueue(PARTS + "/assets/fonts/RobotoCondensed-VariableFont_wght.woff2", "asset")
+    threads = [threading.Thread(target=worker, args=(q,), daemon=True) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
 
-    ar.run()
+    suffix = f"-{SHARD_INDEX}" if SHARD_COUNT > 1 else ""
+    (OUT / f"FETCH_MANIFEST{suffix}.json").write_text(
+        json.dumps(
+            {
+                "site": "https://umamusume.com",
+                "fetched_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "shard": SHARD or "all",
+                "stats": STATS,
+                "files": MANIFEST,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+    if DISCOVERED:
+        (OUT / f"new-urls{suffix}.txt").write_text("\n".join(sorted(DISCOVERED)) + "\n")
 
-    if not ar.manifest:
-        print("nothing fetched", file=sys.stderr)
-        return 1
-
-    by_kind: dict[str, int] = {}
-    for v in ar.manifest.values():
-        by_kind[v["kind"]] = by_kind.get(v["kind"], 0) + 1
-
-    meta = {
-        "site": ORIGIN,
-        "fetched_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "seeded_pages": PAGES,
-        "parts_pages": PARTS_PAGES,
-        "counts": by_kind,
-        "total_bytes": sum(v["bytes"] for v in ar.manifest.values()),
-        "files": ar.manifest,
-    }
-    (OUT / "FETCH_MANIFEST.json").write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n")
-    print(f"done: {len(ar.manifest)} files ({meta['total_bytes']/1024:.1f} KiB) {by_kind}")
-    return 0
+    total = sum(v["bytes"] for v in MANIFEST.values())
+    print(f"shard {SHARD or 'all'} done: {STATS['ok']} ok / {STATS['fail']} failed, {total/1024:.1f} KiB")
+    return 0 if STATS["ok"] else 1
 
 
 if __name__ == "__main__":
