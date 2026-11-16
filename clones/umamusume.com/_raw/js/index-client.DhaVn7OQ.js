@@ -1,0 +1,1 @@
+import{f as t,ak as e,B as u,j as l,u as a}from"./runtime.C1npiaW1.js";function c(n){t===null&&e(),u&&t.l!==null?f(t).m.push(n):l(()=>{const o=a(n);if(typeof o=="function")return o})}function i(n){t===null&&e(),c(()=>()=>a(n))}function f(n){var o=n.l;return o.u??={a:[],b:[],m:[]}}export{i as a,c as o};

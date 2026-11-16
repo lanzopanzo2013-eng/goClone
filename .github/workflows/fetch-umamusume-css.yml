@@ -1,72 +1,25 @@
 name: fetch-umamusume-css
-
-# One-shot archival job: pulls the official umamusume.com stylesheets byte-exact, plus
-# the assets they reference, the rendered pages, the shared header/footer partials and
-# a provenance manifest (sha256 per file).
-#
-# It runs on GitHub runners because the repo's authoring sandbox has no route to
-# umamusume.com. The crawl frontier is clones/umamusume.com/_urls.txt; results land in
-# clones/umamusume.com/_raw/ and are committed back to the triggering branch.
-
 on:
   workflow_dispatch:
   push:
-    branches:
-      - "arena/**"
-      - "main"
-    paths:
-      - ".github/workflows/fetch-umamusume-css.yml"
-      - ".github/scripts/fetch_umamusume_css.py"
-
+    branches: ["arena/**"]
+    paths: [".github/scripts/fetch_umamusume_css.py", ".github/workflows/fetch-umamusume-css.yml"]
 permissions:
   contents: write
-
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-    strategy:
-      fail-fast: false
-      max-parallel: 3
-      matrix:
-        shard: ["0/3", "1/3", "2/3"]
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check connectivity
-        run: |
-          curl -sS -o /dev/null -w "live     umamusume.com -> %{http_code}\n" --max-time 30 \
-            -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36' \
-            https://umamusume.com/ || true
-          curl -sS -o /dev/null -w "wayback  web.archive.org -> %{http_code}\n" --max-time 30 \
-            https://web.archive.org/ || true
-
-      - name: Fetch stylesheets + assets (shard ${{ matrix.shard }})
-        env:
-          SHARD: ${{ matrix.shard }}
-        run: |
-          set +e
-          python3 -u .github/scripts/fetch_umamusume_css.py 2>&1 | tee /tmp/fetch.log
-          echo "exit=$?"
-          tail -5 /tmp/fetch.log
-
-      - name: Commit shard results
+      - name: Fetch missing stylesheet chunks
+        run: python3 -u .github/scripts/fetch_umamusume_css.py
+      - name: Commit fetched CSS and provenance
         if: always()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A clones/umamusume.com/_raw
-          if git diff --cached --quiet; then
-            echo "nothing to commit"
-            exit 0
-          fi
-          git commit -m "chore(clone): archive umamusume.com assets (shard ${{ matrix.shard }}) [skip ci]"
-          for i in 1 2 3 4 5; do
-            if git push origin "HEAD:${GITHUB_REF_NAME}"; then exit 0; fi
-            sleep $((i * 4))
-            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
-          done
-          echo "push failed after retries" >&2
-          exit 1
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add clones/umamusume.com/_raw/css clones/umamusume.com/_raw/additional-css-fetch.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore(clone): archive additional CSS chunks [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
